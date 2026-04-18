@@ -1,15 +1,37 @@
-# Pokémon Doubles Meta Tracker
+# Pokémon Doubles Meta Tracker 📊
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+Real-time VGC 2024 metagame tracker with automatic hourly updates.
 
-Real-time competitive Pokémon doubles metagame analysis tool that scrapes Smogon, Pikalytics, and Pokémon Showdown with hourly updates.
+## 🌐 Live Demo
+[View the tracker](https://dracadonix.github.io/Pokemon-Doubles-Meta-Tracker/)
 
-## Quick Start
+## ✨ Features
+- 🔄 **Auto-updates hourly** via GitHub Actions
+- 📱 **Mobile responsive** design
+- 🔍 **Search any Pokémon**
+- 📈 **Visual usage bars**
+- 💡 **Click for details**
 
-```bash
-# Clone and run
-git clone https://github.com/YOUR_USERNAME/pokemon-doubles-meta-tracker.git
-cd pokemon-doubles-meta-tracker
-pip install -r requirements.txt
-python meta_tracker.py
+## 🚀 How It Works
+1. GitHub Actions fetches Smogon data every hour
+2. Data is saved to `meta_data.json`
+3. GitHub Pages serves the website
+4. Your browser displays the data
+
+## 🛠️ Setup
+1. Fork this repository
+2. Enable GitHub Pages (Settings → Pages → main branch)
+3. Watch it auto-update!
+
+## 📊 Data Source
+- Smogon University VGC 2024 Doubles stats
+- Updated hourly via automated workflow
+
+## 🎯 Commands (in the web interface)
+- Click "Top 10/20/50" to change view
+- Search for any Pokémon
+- Click any Pokémon for details
+
+---
+
+**No installation needed! Just open the website!** 🎉
