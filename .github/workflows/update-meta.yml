@@ -1,0 +1,36 @@
+name: Update Pokémon Meta Data
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Fetch Smogon data
+        run: |
+          curl -s "https://www.smogon.com/stats/2024-02/gen9vgc2023doubles-0.txt" | \
+          grep -E '^ \|' | \
+          awk -F'|' '{print "\""$3"\": " $4}' | \
+          sed 's/%//g' | \
+          head -100 > temp.json
+          echo "{" > meta_data.json
+          cat temp.json | sed 's/^[ \t]*//' | paste -sd, - >> meta_data.json
+          echo "}" >> meta_data.json
+      
+      - name: Clean up data
+        run: |
+          sed -i 's/\"\"/\"/g' meta_data.json
+          sed -i 's/,[[:space:]]*}/}/g' meta_data.json
+      
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add meta_data.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update meta data $(date +'%Y-%m-%d %H:%M:%S')"
+          git push
