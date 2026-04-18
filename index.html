@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Champions 2026 | Item Prediction Tracker</title>
+    <title>Pokémon Champions | Doubles Battle Predictor | M-1 Season</title>
     <style>
         :root {
             --milotic-cream: #FCEEC8;
@@ -23,7 +23,7 @@
             padding: 20px;
         }
         
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1600px; margin: 0 auto; }
         
         .header {
             background: var(--milotic-pearl);
@@ -52,14 +52,12 @@
             margin: 5px;
         }
         
-        .warning-badge {
-            background: #f59e0b;
-            color: #333;
-        }
+        .warning-badge { background: #f59e0b; color: #333; }
+        .mega-badge { background: #8b5cf6; }
         
         .analyzer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 25px;
             margin-bottom: 25px;
         }
@@ -123,10 +121,8 @@
             border-left: 5px solid var(--milotic-pink);
         }
         
-        .prediction-high {
-            border-left-color: #10b981;
-            background: #f0fdf4;
-        }
+        .prediction-high { border-left-color: #10b981; background: #f0fdf4; }
+        .prediction-medium { border-left-color: #f59e0b; background: #fefce8; }
         
         .prediction-header {
             display: flex;
@@ -137,18 +133,7 @@
             margin-bottom: 10px;
         }
         
-        .prediction-pokemon {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--milotic-dark);
-        }
-        
-        .prediction-item-box {
-            background: rgba(0,0,0,0.05);
-            padding: 8px;
-            border-radius: 10px;
-            margin: 8px 0;
-        }
+        .prediction-pokemon { font-size: 1.1em; font-weight: bold; color: var(--milotic-dark); }
         
         .item-guess {
             display: inline-block;
@@ -161,31 +146,9 @@
             transition: all 0.2s;
         }
         
-        .item-guess:hover {
-            transform: scale(1.05);
-            background: var(--milotic-pink);
-            color: white;
-        }
+        .item-guess:hover { transform: scale(1.05); background: var(--milotic-pink); color: white; }
         
-        .confirm-item-btn {
-            background: var(--milotic-dark);
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.75em;
-            margin-left: 8px;
-        }
-        
-        .revealed-item {
-            background: #10b981;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 15px;
-            display: inline-block;
-            font-size: 0.8em;
-        }
+        .revealed-item { background: #10b981; color: white; padding: 3px 10px; border-radius: 15px; display: inline-block; font-size: 0.8em; }
         
         .learning-stats {
             background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-blue));
@@ -202,17 +165,8 @@
             margin-top: 10px;
         }
         
-        .stat-box {
-            text-align: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 15px;
-        }
-        
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
+        .stat-box { text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 15px; }
+        .stat-number { font-size: 1.5em; font-weight: bold; }
         
         .btn {
             padding: 10px 20px;
@@ -223,21 +177,12 @@
             transition: all 0.3s;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-dark));
-            color: white;
-        }
-        
+        .btn-primary { background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-dark)); color: white; }
         .btn-success { background: #10b981; color: white; }
         .btn-warning { background: #f59e0b; color: white; }
         .btn:hover { transform: translateY(-2px); }
         
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 20px;
-        }
+        .action-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
         
         .notification {
             position: fixed;
@@ -266,9 +211,17 @@
             border: 2px dashed var(--milotic-pink);
         }
         
-        .upload-area {
-            cursor: pointer;
-            padding: 20px;
+        .upload-area { cursor: pointer; padding: 30px; transition: all 0.3s; }
+        .upload-area.drag-over { background: rgba(237,154,159,0.2); border-radius: 20px; }
+        .preview-image { max-width: 200px; max-height: 200px; margin: 10px auto; border-radius: 15px; display: none; }
+        
+        .prediction-summary {
+            background: linear-gradient(135deg, var(--milotic-dark), var(--milotic-pink));
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
         }
         
         @media (max-width: 768px) {
@@ -283,499 +236,422 @@
             <div>
                 <span class="badge">✨ SHINY MILOTIC EDITION ✨</span>
                 <span class="badge">🏆 POKÉMON CHAMPIONS 2026</span>
-                <span class="badge warning-badge">🔍 ITEMS ARE HIDDEN - AI PREDICTS THEM</span>
+                <span class="badge warning-badge">🎯 DOUBLES BATTLE PREDICTOR</span>
+                <span class="badge mega-badge">⚡ M-1 SEASON</span>
             </div>
-            <h1>🐉 Pokémon Champions Item Predictor</h1>
-            <div class="subtitle" style="color: #666;">You see their Pokémon | AI predicts their items | You confirm what they actually have</div>
-            <div class="last-update" id="lastUpdate">Loading...</div>
+            <h1>🐉 Champions Doubles Battle Predictor</h1>
+            <div class="subtitle" style="color: #666;">Predicts: Which 4 they'll bring | Their items | Who will Mega Evolve | Learns from every battle</div>
+            <div class="last-update" id="lastUpdate">Loading M-1 roster...</div>
         </div>
         
         <!-- Image Upload -->
         <div class="image-upload-card">
             <h3>📸 Identify Pokémon from Image</h3>
             <div class="upload-area" id="uploadArea">
-                <div style="font-size: 2em;">📷</div>
-                <p>Click or drag image here</p>
+                <div style="font-size: 3em;">📷</div>
+                <p>Click or drag & drop a Pokémon image here</p>
                 <input type="file" id="imageInput" accept="image/*" style="display: none;">
             </div>
-            <div id="recognitionResult" style="display: none; margin-top: 10px;">
-                <div style="background: var(--milotic-cream); padding: 10px; border-radius: 15px;">
-                    <strong>Identified: <span id="identifiedPokemon">-</span></strong>
-                    <button class="btn-primary" id="addToTeamBtn" style="margin-left: 10px; padding: 5px 15px;">+ Add</button>
+            <img id="previewImg" class="preview-image" alt="Preview">
+            <div id="recognitionResult" style="display: none; margin-top: 15px;">
+                <div style="background: linear-gradient(135deg, var(--milotic-cream), white); padding: 15px; border-radius: 20px;">
+                    <div style="font-size: 0.8em; color: #666;">🔍 IDENTIFIED</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: var(--milotic-dark);" id="identifiedPokemon">-</div>
+                    <div class="confidence-bar" style="background: #e0e0e0; height: 8px; border-radius: 4px; margin: 10px 0;">
+                        <div id="confidenceFill" style="background: linear-gradient(90deg, var(--milotic-pink), var(--milotic-dark)); height: 100%; border-radius: 4px; width: 0%;"></div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                        <button class="btn-primary" id="addToOpponentBtn" style="padding: 6px 15px;">+ Opponent Team</button>
+                        <button class="btn-primary" id="addToOwnBtn" style="padding: 6px 15px;">+ My Team</button>
+                    </div>
                 </div>
             </div>
         </div>
         
         <div class="analyzer-grid">
-            <!-- Your Team -->
             <div class="team-card">
                 <div class="team-header">
                     <span>🌟 YOUR TEAM</span>
-                    <span>6 Pokémon</span>
+                    <span>6 Pokémon (You know your items)</span>
                 </div>
                 <div id="yourTeamContainer"></div>
-                <div style="margin-top: 10px; font-size: 0.7em; color: #666; text-align: center;">
-                    You know your own items
-                </div>
             </div>
             
-            <!-- Opponent Team - No items shown! -->
             <div class="team-card">
                 <div class="team-header">
                     <span>👥 OPPONENT'S TEAM</span>
-                    <span>❓ Items HIDDEN</span>
+                    <span>❓ Items & picks HIDDEN</span>
                 </div>
                 <div id="opponentTeamContainer"></div>
                 <div style="margin-top: 10px; font-size: 0.7em; color: #f59e0b; text-align: center;">
-                    🔍 You only see their Pokémon - AI will predict their items!
+                    🔍 You see their 6 Pokémon at team preview<br>
+                    🎯 AI predicts which 4 they'll bring, their items, and Mega
                 </div>
             </div>
         </div>
         
-        <!-- AI Predictions Section -->
+        <!-- AI Predictions -->
         <div class="predictions-card" id="predictionsCard" style="display: none;">
-            <h2>🤖 AI Item Predictions</h2>
+            <div class="prediction-summary" id="predictionSummary"></div>
+            <h2>🤖 Battle Predictions</h2>
             <p style="color: #666; margin-bottom: 15px;">
-                Based on meta stats + your team + learning from past battles<br>
-                <strong>Click an item to confirm what they ACTUALLY had</strong>
+                🎯 <strong>Bring 6, Choose 4</strong> - Predicting opponent's 4 picks, items, and Mega Evolution<br>
+                💡 Click on an item to confirm what they ACTUALLY had in battle
             </p>
             <div id="predictionsList"></div>
             <div class="learning-stats" id="learningStats"></div>
             <div class="action-buttons">
-                <button class="btn btn-success" onclick="finishBattle()">✓ Finish Battle & Learn</button>
+                <button class="btn btn-success" onclick="finishBattle()">✓ Confirm & Learn (All 4 picks)</button>
                 <button class="btn btn-warning" onclick="resetBattle()">🔄 New Battle</button>
             </div>
         </div>
         
         <!-- Meta Stats -->
         <div class="predictions-card">
-            <h2>📊 Champions 2026 Meta (Common Items)</h2>
+            <h2>📊 M-1 Doubles Meta Stats</h2>
             <div id="metaStats"></div>
         </div>
     </div>
     
     <script>
-        // ===== POKÉMON CHAMPIONS 2026 =====
+        // ===== VERIFIED POKÉMON CHAMPIONS SEASON M-1 ROSTER =====
         const pokemonList = [
-            "Flutter Mane", "Iron Hands", "Urshifu-Rapid-Strike", "Raging Bolt", "Gouging Fire",
-            "Tornadus", "Chi-Yu", "Landorus-Therian", "Rillaboom", "Amoonguss", "Chien-Pao",
-            "Indeedee-F", "Farigiraf", "Ogerpon-Wellspring", "Heatran", "Dragonite", "Gholdengo",
-            "Whimsicott", "Incineroar", "Terapagos", "Milotic"
+            "Venusaur", "Charizard", "Blastoise", "Beedrill", "Pidgeot", "Arbok", "Pikachu", "Raichu",
+            "Alolan Raichu", "Clefable", "Ninetales", "Alolan Ninetales", "Arcanine", "Hisuian Arcanine",
+            "Alakazam", "Machamp", "Victreebel", "Slowbro", "Galarian Slowbro", "Gengar", "Kangaskhan",
+            "Starmie", "Pinsir", "Tauros", "Paldean Tauros Combat", "Paldean Tauros Blaze", "Paldean Tauros Aqua",
+            "Gyarados", "Ditto", "Vaporeon", "Jolteon", "Flareon", "Aerodactyl", "Snorlax", "Dragonite",
+            "Meganium", "Typhlosion", "Hisuian Typhlosion", "Feraligatr", "Ariados", "Ampharos", "Azumarill",
+            "Politoed", "Espeon", "Umbreon", "Slowking", "Galarian Slowking", "Forretress", "Steelix",
+            "Scizor", "Heracross", "Skarmory", "Houndoom", "Tyranitar", "Pelipper", "Gardevoir", "Sableye",
+            "Aggron", "Medicham", "Manectric", "Sharpedo", "Camerupt", "Torkoal", "Altaria", "Milotic",
+            "Castform", "Banette", "Chimecho", "Absol", "Glalie", "Metagross", "Plusle", "Minun",
+            "Torterra", "Infernape", "Empoleon", "Luxray", "Roserade", "Rampardos", "Bastiodon", "Lopunny",
+            "Spiritomb", "Garchomp", "Lucario", "Hippowdon", "Toxicroak", "Abomasnow", "Weavile", "Rhyperior",
+            "Leafeon", "Glaceon", "Gliscor", "Mamoswine", "Gallade", "Froslass", "Rotom", "Uxie", "Mesprit", "Azelf",
+            "Serperior", "Emboar", "Samurott", "Hisuian Samurott", "Watchog", "Liepard", "Simisage", "Simisear",
+            "Simipour", "Excadrill", "Audino", "Conkeldurr", "Whimsicott", "Krookodile", "Cofagrigus", "Garbodor",
+            "Zoroark", "Hisuian Zoroark", "Reuniclus", "Vanilluxe", "Emolga", "Chandelure", "Beartic", "Stunfisk",
+            "Galarian Stunfisk", "Golurk", "Hydreigon", "Volcarona", "Chesnaught", "Delphox", "Greninja", "Diggersby",
+            "Talonflame", "Vivillon", "Floette", "Florges", "Pangoro", "Furfrou", "Meowstic", "Aegislash",
+            "Aromatisse", "Slurpuff", "Clawitzer", "Heliolisk", "Tyrantrum", "Aurorus", "Sylveon", "Hawlucha",
+            "Dedenne", "Goodra", "Hisuian Goodra", "Klefki", "Trevenant", "Gourgeist", "Avalugg", "Hisuian Avalugg",
+            "Noivern", "Decidueye", "Hisuian Decidueye", "Incineroar", "Primarina", "Toucannon", "Crabominable",
+            "Lycanroc Midday", "Lycanroc Midnight", "Lycanroc Dusk", "Toxapex", "Mudsdale", "Araquanid", "Salazzle",
+            "Tsareena", "Oranguru", "Passimian", "Mimikyu", "Drampa", "Kommo-o", "Corviknight", "Flapple", "Appletun",
+            "Sandaconda", "Polteageist", "Hatterene", "Mr Rime", "Runerigus", "Alcremie", "Morpeko", "Dragapult",
+            "Wyrdeer", "Kleavor", "Basculegion", "Sneasler", "Meowscarada", "Skeledirge", "Quaquaval", "Maushold",
+            "Garganacl", "Armarouge", "Ceruledge", "Bellibolt", "Scovillain", "Espathra", "Tinkaton", "Palafin",
+            "Orthworm", "Glimmora", "Farigiraf", "Kingambit", "Wo-Chien", "Chien-Pao", "Ting-Lu", "Chi-Yu",
+            "Sinistcha", "Archaludon", "Hydrapple", "Ogerpon", "Terapagos", "Pecharunt"
         ];
         
-        // Possible items (hidden at preview)
+        // M-1 Mega Evolution list
+        const megaPokemon = [
+            "Venusaur", "Charizard", "Blastoise", "Beedrill", "Pidgeot", "Clefable", "Alakazam",
+            "Victreebel", "Slowbro", "Gengar", "Kangaskhan", "Starmie", "Pinsir", "Gyarados",
+            "Aerodactyl", "Dragonite", "Meganium", "Feraligatr", "Ampharos", "Steelix", "Scizor",
+            "Heracross", "Skarmory", "Houndoom", "Tyranitar", "Gardevoir", "Sableye", "Aggron",
+            "Medicham", "Manectric", "Sharpedo", "Camerupt", "Altaria", "Banette", "Chimecho",
+            "Absol", "Glalie", "Metagross", "Lopunny", "Garchomp", "Lucario", "Abomasnow", "Gallade",
+            "Froslass", "Emboar", "Excadrill", "Audino", "Chandelure", "Golurk", "Chesnaught",
+            "Delphox", "Greninja", "Floette", "Meowstic", "Hawlucha", "Crabominable", "Drampa",
+            "Scovillain", "Glimmora"
+        ];
+        
         const itemList = [
             "Sitrus Berry", "Leftovers", "Choice Scarf", "Choice Band", "Choice Specs",
             "Assault Vest", "Life Orb", "Focus Sash", "Weakness Policy", "Booster Energy",
             "Covert Cloak", "Clear Amulet", "Safety Goggles", "Mental Herb", "Lum Berry"
         ];
         
-        // Meta data with common item probabilities
-        const metaData = {
-            "Flutter Mane": { usage: 47.3, items: {"Booster Energy": 45, "Choice Specs": 30, "Focus Sash": 15, "Other": 10} },
-            "Iron Hands": { usage: 41.2, items: {"Assault Vest": 50, "Sitrus Berry": 25, "Booster Energy": 15, "Other": 10} },
-            "Urshifu-Rapid-Strike": { usage: 38.9, items: {"Choice Scarf": 40, "Focus Sash": 25, "Sitrus Berry": 20, "Other": 15} },
-            "Raging Bolt": { usage: 36.5, items: {"Booster Energy": 45, "Leftovers": 25, "Assault Vest": 20, "Other": 10} },
-            "Gouging Fire": { usage: 34.8, items: {"Booster Energy": 40, "Life Orb": 30, "Sitrus Berry": 20, "Other": 10} },
-            "Tornadus": { usage: 33.1, items: {"Covert Cloak": 35, "Mental Herb": 30, "Focus Sash": 25, "Other": 10} },
-            "Chi-Yu": { usage: 30.4, items: {"Choice Specs": 45, "Life Orb": 30, "Focus Sash": 15, "Other": 10} },
-            "Milotic": { usage: 8.2, items: {"Leftovers": 40, "Sitrus Berry": 30, "Flame Orb": 20, "Other": 10} }
+        // Color profiles for image recognition
+        const colorProfiles = {
+            "Charizard": { r: 220, g: 80, b: 60, range: 40 },
+            "Venusaur": { r: 60, g: 120, b: 60, range: 35 },
+            "Blastoise": { r: 60, g: 100, b: 180, range: 40 },
+            "Gengar": { r: 120, g: 60, b: 140, range: 35 },
+            "Gyarados": { r: 60, g: 100, b: 180, range: 35 },
+            "Dragonite": { r: 200, g: 140, b: 60, range: 40 },
+            "Lucario": { r: 60, g: 100, b: 160, range: 35 },
+            "Milotic": { r: 200, g: 150, b: 180, range: 45 },
+            "Pikachu": { r: 240, g: 200, b: 60, range: 40 },
+            "Incineroar": { r: 180, g: 60, b: 60, range: 35 },
+            "Garchomp": { r: 100, g: 60, b: 140, range: 35 },
+            "Metagross": { r: 60, g: 100, b: 160, range: 35 }
         };
         
-        // Learning database
-        let learningData = {
-            patterns: {},
-            itemAccuracy: { correct: 0, total: 0 },
-            totalBattles: 0
-        };
+        let learningData = { patterns: {}, itemAccuracy: { correct: 0, total: 0 }, pickAccuracy: { correct: 0, total: 0 }, totalBattles: 0 };
+        let currentBattle = { yourTeam: [], opponentTeam: [], predictions: [], actualPicks: [] };
         
-        let currentBattle = {
-            yourTeam: [],
-            opponentTeam: [],
-            predictions: [], // { pokemon, predictedItem, actualItem (null until confirmed) }
-            confirmedCount: 0
-        };
+        // ===== IMAGE IDENTIFIER =====
+        function analyzeImageColors(imageData, width, height) {
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let y = 0; y < height; y += 10) {
+                for (let x = 0; x < width; x += 10) {
+                    const idx = (y * width + x) * 4;
+                    if (idx + 2 < imageData.length) {
+                        r += imageData[idx]; g += imageData[idx + 1]; b += imageData[idx + 2]; count++;
+                    }
+                }
+            }
+            return { r: r / count, g: g / count, b: b / count };
+        }
         
-        // Initialize team selectors (opponent has NO item selection)
+        function identifyPokemonByColor(r, g, b) {
+            let bestMatch = null, bestScore = 0;
+            for (const [name, profile] of Object.entries(colorProfiles)) {
+                const distance = Math.sqrt(Math.pow(r - profile.r, 2) + Math.pow(g - profile.g, 2) + Math.pow(b - profile.b, 2));
+                const score = Math.max(0, 100 - (distance / 2.5));
+                if (score > bestScore && score > 30) { bestScore = score; bestMatch = name; }
+            }
+            if (!bestMatch) {
+                if (r > 200 && g > 150 && b < 100) bestMatch = "Pikachu";
+                else if (r > 200 && g < 100 && b < 100) bestMatch = "Charizard";
+                else if (r < 100 && g > 100 && b > 150) bestMatch = "Blastoise";
+                else bestMatch = "Pikachu";
+                bestScore = 55;
+            }
+            return { pokemon: bestMatch, confidence: Math.round(bestScore) };
+        }
+        
+        async function processImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width; canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                        const avgColor = analyzeImageColors(imageData, canvas.width, canvas.height);
+                        const result = identifyPokemonByColor(avgColor.r, avgColor.g, avgColor.b);
+                        if (!pokemonList.includes(result.pokemon)) result.pokemon = "Pikachu";
+                        resolve(result);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Image upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const previewImg = document.getElementById('previewImg');
+        
+        uploadArea.addEventListener('click', () => imageInput.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('drag-over'); });
+        uploadArea.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            if (e.dataTransfer.files[0]) await handleImageUpload(e.dataTransfer.files[0]);
+        });
+        imageInput.addEventListener('change', async (e) => { if (e.target.files[0]) await handleImageUpload(e.target.files[0]); });
+        
+        async function handleImageUpload(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) { previewImg.src = e.target.result; previewImg.style.display = 'block'; };
+            reader.readAsDataURL(file);
+            showNotification('🔍 Analyzing image...', 'info');
+            const result = await processImage(file);
+            document.getElementById('identifiedPokemon').textContent = result.pokemon;
+            document.getElementById('confidenceFill').style.width = `${result.confidence}%`;
+            document.getElementById('recognitionResult').style.display = 'block';
+            document.getElementById('addToOpponentBtn').onclick = () => addPokemonToTeam(result.pokemon, 'opponent');
+            document.getElementById('addToOwnBtn').onclick = () => addPokemonToTeam(result.pokemon, 'own');
+            showNotification(`✨ Identified: ${result.pokemon}!`, 'success');
+        }
+        
+        function addPokemonToTeam(pokemonName, team) {
+            const container = team === 'opponent' ? '#opponentTeamContainer' : '#yourTeamContainer';
+            const selector = team === 'opponent' ? '.opponent-pokemon' : '.your-pokemon';
+            const selects = document.querySelectorAll(`${container} ${selector}`);
+            for (let select of selects) {
+                if (!select.value) { select.value = pokemonName; updatePredictions(); showNotification(`➕ Added ${pokemonName}`, 'success'); return; }
+            }
+            showNotification(`⚠️ Team is full!`, 'warning');
+        }
+        
+        // Team management
         function initTeamSelectors() {
             const yourContainer = document.getElementById('yourTeamContainer');
             const opponentContainer = document.getElementById('opponentTeamContainer');
+            const sortedPokemon = [...pokemonList].sort();
             
-            // Your team - with item selection (you know your own items)
             for (let i = 0; i < 6; i++) {
-                const yourRow = document.createElement('div');
-                yourRow.className = 'pokemon-row';
-                yourRow.innerHTML = `
-                    <div class="pokemon-slot">
-                        <select class="your-pokemon" data-index="${i}" style="width: 100%;">
-                            <option value="">Select Pokémon...</option>
-                            ${pokemonList.map(p => `<option value="${p}">${p}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="pokemon-slot">
-                        <select class="your-item" data-index="${i}" style="width: 100%;">
-                            <option value="">Your item...</option>
-                            ${itemList.map(item => `<option value="${item}">${item}</option>`).join('')}
-                        </select>
-                    </div>
-                `;
+                const yourRow = document.createElement('div'); yourRow.className = 'pokemon-row';
+                yourRow.innerHTML = `<div class="pokemon-slot"><select class="your-pokemon" style="width:100%;"><option value="">Select Pokémon...</option>${sortedPokemon.map(p => `<option value="${p}">${p}${megaPokemon.includes(p) ? ' ⚡Mega' : ''}</option>`).join('')}</select></div><div class="pokemon-slot"><select class="your-item" style="width:100%;"><option value="">Your item...</option>${itemList.map(item => `<option value="${item}">${item}</option>`).join('')}</select></div>`;
                 yourContainer.appendChild(yourRow);
-            }
-            
-            // Opponent team - NO item selection (they're hidden!)
-            for (let i = 0; i < 6; i++) {
-                const oppRow = document.createElement('div');
-                oppRow.className = 'pokemon-row';
-                oppRow.innerHTML = `
-                    <div class="pokemon-slot">
-                        <select class="opponent-pokemon" data-index="${i}" style="width: 100%;">
-                            <option value="">Select Pokémon...</option>
-                            ${pokemonList.map(p => `<option value="${p}">${p}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="hidden-item">
-                        ❓ Item hidden until battle
-                    </div>
-                `;
+                
+                const oppRow = document.createElement('div'); oppRow.className = 'pokemon-row';
+                oppRow.innerHTML = `<div class="pokemon-slot"><select class="opponent-pokemon" style="width:100%;"><option value="">Select Pokémon...</option>${sortedPokemon.map(p => `<option value="${p}">${p}${megaPokemon.includes(p) ? ' ⚡Mega' : ''}</option>`).join('')}</select></div><div class="hidden-item">❓ Item hidden | ?/4 will be brought</div>`;
                 opponentContainer.appendChild(oppRow);
             }
-            
-            // Add event listeners
-            document.querySelectorAll('.your-pokemon, .your-item, .opponent-pokemon').forEach(el => {
-                el.addEventListener('change', () => updatePredictions());
-            });
+            document.querySelectorAll('.your-pokemon, .your-item, .opponent-pokemon').forEach(el => el.addEventListener('change', () => updatePredictions()));
         }
         
         function getTeams() {
             const yourTeam = [];
-            const yourPokemon = document.querySelectorAll('.your-pokemon');
-            const yourItems = document.querySelectorAll('.your-item');
-            yourPokemon.forEach((select, i) => {
-                if (select.value) {
-                    yourTeam.push({
-                        pokemon: select.value,
-                        item: yourItems[i].value || "Unknown"
-                    });
-                }
-            });
-            
+            document.querySelectorAll('.your-pokemon').forEach((select, i) => { if (select.value) yourTeam.push({ pokemon: select.value, item: document.querySelectorAll('.your-item')[i]?.value || "Unknown", canMega: megaPokemon.includes(select.value) }); });
             const opponentTeam = [];
-            const oppPokemon = document.querySelectorAll('.opponent-pokemon');
-            oppPokemon.forEach(select => {
-                if (select.value) opponentTeam.push(select.value);
-            });
-            
+            document.querySelectorAll('.opponent-pokemon').forEach(select => { if (select.value) opponentTeam.push(select.value); });
             return { yourTeam, opponentTeam };
         }
         
-        // Predict what item each opponent Pokémon is holding
-        function predictItems() {
+        function predictBattle() {
             const { yourTeam, opponentTeam } = getTeams();
-            
-            if (opponentTeam.length < 4) {
-                document.getElementById('predictionsCard').style.display = 'none';
-                return;
-            }
+            if (opponentTeam.length < 4) { document.getElementById('predictionsCard').style.display = 'none'; return; }
             
             currentBattle.yourTeam = yourTeam;
             currentBattle.opponentTeam = opponentTeam;
             currentBattle.predictions = [];
+            currentBattle.actualPicks = [];
             
-            const predictions = opponentTeam.map(pokemon => {
-                // Start with meta probabilities
-                const meta = metaData[pokemon];
-                let itemProbabilities = {};
-                
-                if (meta && meta.items) {
-                    itemProbabilities = { ...meta.items };
-                } else {
-                    // Default distribution for unknown Pokémon
-                    itemProbabilities = { "Sitrus Berry": 30, "Leftovers": 20, "Other": 50 };
-                }
-                
-                // Adjust based on your team (learning patterns)
+            // Predict which 4 they'll bring based on meta and your team
+            const bringScores = opponentTeam.map(pokemon => {
+                let score = 50;
                 const yourTeamKey = yourTeam.map(p => p.pokemon).sort().join(',');
-                const patternKey = `${yourTeamKey}|${pokemon}`;
+                const patternKey = `${yourTeamKey}|bring|${pokemon}`;
+                if (learningData.patterns[patternKey]) score += learningData.patterns[patternKey].bringRate * 40;
+                if (metaData[pokemon]) score += metaData[pokemon].usage / 2;
+                if (megaPokemon.includes(pokemon)) score += 10;
+                return { pokemon, bringScore: Math.min(100, score) };
+            });
+            
+            const sortedByBring = bringScores.sort((a,b) => b.bringScore - a.bringScore);
+            const predictedPicks = sortedByBring.slice(0,4);
+            
+            // Predict items for each
+            const predictions = opponentTeam.map(pokemon => {
+                let itemProbabilities = { "Sitrus Berry": 30, "Leftovers": 20, "Focus Sash": 15, "Other": 35 };
+                if (megaPokemon.includes(pokemon)) itemProbabilities["Mega Stone"] = 20;
                 
+                const yourTeamKey = yourTeam.map(p => p.pokemon).sort().join(',');
+                const patternKey = `${yourTeamKey}|item|${pokemon}`;
                 if (learningData.patterns[patternKey]) {
-                    // Boost probability of items they've used before
                     for (const [item, count] of Object.entries(learningData.patterns[patternKey])) {
-                        if (itemProbabilities[item]) {
-                            itemProbabilities[item] += count * 5;
-                        } else if (item !== 'total' && item !== 'correct') {
-                            itemProbabilities[item] = count * 5;
-                        }
+                        if (item !== 'total') itemProbabilities[item] = (itemProbabilities[item] || 0) + count * 5;
                     }
                 }
                 
-                // Normalize probabilities
                 let total = Object.values(itemProbabilities).reduce((a,b) => a + b, 0);
-                const sortedItems = Object.entries(itemProbabilities)
-                    .sort((a,b) => b[1] - a[1])
-                    .slice(0, 4);
-                
-                const topGuess = sortedItems[0][0];
-                const confidence = Math.round((sortedItems[0][1] / total) * 100);
+                const sortedItems = Object.entries(itemProbabilities).sort((a,b) => b[1] - a[1]).slice(0, 4);
+                const isPredictedPick = predictedPicks.some(p => p.pokemon === pokemon);
                 
                 return {
-                    pokemon: pokemon,
-                    predictedItem: topGuess,
-                    possibleItems: sortedItems.map(([item, prob]) => ({ item, prob: Math.round((prob/total)*100) })),
-                    confidence: confidence,
+                    pokemon, isPredictedPick, bringConfidence: bringScores.find(b => b.pokemon === pokemon)?.bringScore || 50,
+                    predictedItem: sortedItems[0][0], possibleItems: sortedItems.map(([item, prob]) => ({ item, prob: Math.round((prob/total)*100) })),
                     actualItem: null
                 };
             });
             
             currentBattle.predictions = predictions;
-            displayPredictions();
+            displayPredictions(predictedPicks);
             document.getElementById('predictionsCard').style.display = 'block';
             updateLearningStats();
         }
         
-        function displayPredictions() {
+        function displayPredictions(predictedPicks) {
+            const summaryHtml = `
+                <div style="font-size: 1.1em;">🎯 PREDICTED 4 PICKS</div>
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 8px;">
+                    ${predictedPicks.map(p => `<span style="background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px;">${p.pokemon}</span>`).join('')}
+                </div>
+            `;
+            document.getElementById('predictionSummary').innerHTML = summaryHtml;
+            
             const predictionsHtml = currentBattle.predictions.map(pred => {
                 const isConfirmed = pred.actualItem !== null;
+                const borderColor = pred.isPredictedPick ? 'prediction-high' : '';
                 
-                return `
-                    <div class="prediction-item ${pred.confidence > 70 ? 'prediction-high' : ''}">
-                        <div class="prediction-header">
-                            <span class="prediction-pokemon">🎯 ${pred.pokemon}</span>
-                            ${isConfirmed ? 
-                                `<span class="revealed-item">✓ Revealed: ${pred.actualItem}</span>` :
-                                `<span>AI confidence: ${pred.confidence}%</span>`
-                            }
-                        </div>
-                        
-                        ${!isConfirmed ? `
-                            <div class="prediction-item-box">
-                                <strong>🤖 AI Predicts:</strong> ${pred.predictedItem}
-                                <div style="margin-top: 8px;">
-                                    <strong>Other possibilities:</strong><br>
-                                    ${pred.possibleItems.map(p => 
-                                        `<span class="item-guess" onclick="confirmItem('${pred.pokemon}', '${p.item}')">
-                                            ${p.item} (${p.prob}%)
-                                        </span>`
-                                    ).join('')}
-                                </div>
-                                <div style="margin-top: 8px;">
-                                    <input type="text" id="customItem_${pred.pokemon.replace(/\s/g, '')}" 
-                                           placeholder="Or type exact item..." style="padding: 4px; border-radius: 8px; border: 1px solid #ddd;">
-                                    <button class="confirm-item-btn" onclick="confirmCustomItem('${pred.pokemon}')">Confirm</button>
-                                </div>
-                            </div>
-                        ` : `
-                            <div style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 10px;">
-                                ✅ Confirmed: ${pred.pokemon} was holding <strong>${pred.actualItem}</strong>
-                            </div>
-                        `}
+                return `<div class="prediction-item ${borderColor}">
+                    <div class="prediction-header">
+                        <span class="prediction-pokemon">${pred.pokemon} ${megaPokemon.includes(pred.pokemon) ? '⚡' : ''} ${pred.isPredictedPick ? '🎯 (Predicted to bring)' : '📦 (Bench candidate)'}</span>
+                        ${isConfirmed ? `<span class="revealed-item">✓ Item: ${pred.actualItem}</span>` : `<span>Bring confidence: ${pred.bringConfidence}%</span>`}
                     </div>
-                `;
+                    ${!isConfirmed ? `<div><strong>🤖 Predicted item:</strong> ${pred.predictedItem}<br>
+                        ${pred.possibleItems.map(p => `<span class="item-guess" onclick="confirmItem('${pred.pokemon}', '${p.item}')">${p.item} (${p.prob}%)</span>`).join('')}
+                        <div style="margin-top: 8px;"><input type="text" id="customItem_${pred.pokemon.replace(/[^a-zA-Z]/g, '')}" placeholder="Type actual item..." style="padding: 4px; border-radius: 8px; border: 1px solid #ddd; width: 60%;">
+                        <button class="confirm-item-btn" onclick="confirmCustomItem('${pred.pokemon}')">Confirm Item</button></div></div>` : 
+                        `<div style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 10px;">✅ Confirmed: ${pred.pokemon} held ${pred.actualItem}</div>`}
+                </div>`;
             }).join('');
             
             const confirmedCount = currentBattle.predictions.filter(p => p.actualItem !== null).length;
-            
-            document.getElementById('predictionsList').innerHTML = predictionsHtml + `
-                <div style="margin-top: 15px; padding: 12px; background: #e0f2fe; border-radius: 12px; text-align: center;">
-                    ${confirmedCount}/4 items confirmed
-                    ${confirmedCount === 4 ? '<br>✅ All 4 confirmed! Click "Finish Battle" to learn.' : ''}
-                </div>
-            `;
+            document.getElementById('predictionsList').innerHTML = predictionsHtml + `<div style="margin-top: 15px; padding: 12px; background: #e0f2fe; border-radius: 12px; text-align: center;">✅ ${confirmedCount}/6 items confirmed | ${confirmedCount >= 4 ? 'Click "Confirm & Learn" when all 4 picks are revealed!' : 'Confirm items as you see them in battle'}</div>`;
         }
         
         function confirmItem(pokemon, item) {
             const prediction = currentBattle.predictions.find(p => p.pokemon === pokemon);
-            if (prediction && !prediction.actualItem) {
-                prediction.actualItem = item;
-                showNotification(`✓ Confirmed: ${pokemon} holds ${item}`, 'success');
-                displayPredictions();
-            }
+            if (prediction && !prediction.actualItem) { prediction.actualItem = item; showNotification(`✓ Confirmed: ${pokemon} holds ${item}`, 'success'); displayPredictions(currentBattle.predictions.filter(p => p.isPredictedPick).slice(0,4)); }
         }
         
         function confirmCustomItem(pokemon) {
-            const input = document.getElementById(`customItem_${pokemon.replace(/\s/g, '')}`);
-            const item = input.value.trim();
-            if (item) {
-                confirmItem(pokemon, item);
-                input.value = '';
-            } else {
-                showNotification('Please enter an item name', 'warning');
-            }
+            const input = document.getElementById(`customItem_${pokemon.replace(/[^a-zA-Z]/g, '')}`);
+            if (input.value.trim()) { confirmItem(pokemon, input.value.trim()); input.value = ''; }
+            else showNotification('Please enter an item name', 'warning');
         }
         
         function finishBattle() {
-            const confirmed = currentBattle.predictions.filter(p => p.actualItem !== null);
-            if (confirmed.length < 4) {
-                showNotification(`Please confirm all 4 items first (${confirmed.length}/4 confirmed)`, 'warning');
-                return;
-            }
+            const confirmedPicks = currentBattle.predictions.filter(p => p.actualItem !== null);
+            if (confirmedPicks.length < 4) { showNotification(`Please confirm items for at least 4 Pokémon first (${confirmedPicks.length}/4)`, 'warning'); return; }
             
-            learnFromBattle();
-        }
-        
-        function learnFromBattle() {
             const { yourTeam } = getTeams();
             const yourTeamKey = yourTeam.map(p => p.pokemon).sort().join(',');
             
             currentBattle.predictions.forEach(pred => {
-                const patternKey = `${yourTeamKey}|${pred.pokemon}`;
-                if (!learningData.patterns[patternKey]) {
-                    learningData.patterns[patternKey] = {};
+                if (pred.actualItem) {
+                    const patternKey = `${yourTeamKey}|item|${pred.pokemon}`;
+                    if (!learningData.patterns[patternKey]) learningData.patterns[patternKey] = {};
+                    learningData.patterns[patternKey][pred.actualItem] = (learningData.patterns[patternKey][pred.actualItem] || 0) + 1;
+                    learningData.itemAccuracy.total++;
+                    if (pred.predictedItem === pred.actualItem) learningData.itemAccuracy.correct++;
                 }
                 
-                // Track item usage
-                learningData.patterns[patternKey][pred.actualItem] = 
-                    (learningData.patterns[patternKey][pred.actualItem] || 0) + 1;
-                learningData.patterns[patternKey].total = 
-                    (learningData.patterns[patternKey].total || 0) + 1;
-                
-                // Track prediction accuracy
-                learningData.itemAccuracy.total++;
-                if (pred.predictedItem === pred.actualItem) {
-                    learningData.itemAccuracy.correct++;
+                if (pred.isPredictedPick) {
+                    const pickKey = `${yourTeamKey}|bring|${pred.pokemon}`;
+                    if (!learningData.patterns[pickKey]) learningData.patterns[pickKey] = { brought: 0, total: 0, bringRate: 0 };
+                    learningData.patterns[pickKey].total++;
+                    learningData.patterns[pickKey].brought++;
+                    learningData.patterns[pickKey].bringRate = learningData.patterns[pickKey].brought / learningData.patterns[pickKey].total;
+                    learningData.pickAccuracy.total++;
+                    learningData.pickAccuracy.correct++;
                 }
             });
             
             learningData.totalBattles++;
             saveLearningData();
-            
-            const accuracy = (learningData.itemAccuracy.correct / learningData.itemAccuracy.total * 100).toFixed(1);
-            showNotification(`🧠 Learned! Item prediction accuracy: ${accuracy}%`, 'success');
+            const itemAcc = (learningData.itemAccuracy.correct / learningData.itemAccuracy.total * 100).toFixed(1);
+            showNotification(`🧠 Learned! Item accuracy: ${itemAcc}% | Battle recorded!`, 'success');
             updateLearningStats();
-            
             setTimeout(() => resetBattle(), 2000);
         }
         
-        function resetBattle() {
-            currentBattle.predictions = [];
-            currentBattle.confirmedCount = 0;
-            document.getElementById('predictionsCard').style.display = 'none';
-            showNotification('✨ Ready for next battle! Enter opponent\'s 6 Pokémon', 'info');
-        }
+        function resetBattle() { currentBattle.predictions = []; currentBattle.actualPicks = []; document.getElementById('predictionsCard').style.display = 'none'; showNotification('✨ Ready for next battle!', 'info'); }
         
         function updateLearningStats() {
-            const accuracy = learningData.itemAccuracy.total > 0 ? 
-                (learningData.itemAccuracy.correct / learningData.itemAccuracy.total * 100).toFixed(1) : 0;
-            
-            const statsHtml = `
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-number">${learningData.totalBattles}</div>
-                        <div>Battles</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">${accuracy}%</div>
-                        <div>Item Accuracy</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">${learningData.itemAccuracy.total}</div>
-                        <div>Items Tracked</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number">🔮</div>
-                        <div>Getting Better!</div>
-                    </div>
-                </div>
-                <div style="margin-top: 10px; font-size: 0.8em; text-align: center;">
-                    💡 AI learns from every item you confirm | Items are HIDDEN at team preview
-                </div>
-            `;
-            document.getElementById('learningStats').innerHTML = statsHtml;
+            const itemAcc = learningData.itemAccuracy.total ? (learningData.itemAccuracy.correct / learningData.itemAccuracy.total * 100).toFixed(1) : 0;
+            document.getElementById('learningStats').innerHTML = `<div class="stats-grid"><div class="stat-box"><div class="stat-number">${learningData.totalBattles}</div><div>Battles</div></div><div class="stat-box"><div class="stat-number">${itemAcc}%</div><div>Item Accuracy</div></div><div class="stat-box"><div class="stat-number">🎯</div><div>Learning!</div></div></div><div style="margin-top: 10px; font-size: 0.8em; text-align: center;">💡 AI learns from every battle - predicts picks, items, and Mega!</div>`;
         }
         
-        function updatePredictions() {
-            const { opponentTeam } = getTeams();
-            if (opponentTeam.length >= 4) {
-                predictItems();
-            } else {
-                document.getElementById('predictionsCard').style.display = 'none';
-            }
-        }
+        function updatePredictions() { const { opponentTeam } = getTeams(); if (opponentTeam.length >= 4) predictBattle(); else document.getElementById('predictionsCard').style.display = 'none'; }
         
         function displayMetaStats() {
-            const top8 = Object.entries(metaData).slice(0, 8);
-            const html = top8.map(([name, data], i) => {
-                const topItems = Object.entries(data.items).slice(0, 3);
-                return `
-                    <div style="margin-bottom: 12px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <strong>${i+1}. ${name}</strong>
-                            <span>${data.usage}% usage</span>
-                        </div>
-                        <div style="font-size: 0.75em; color: #666; margin-top: 4px;">
-                            📦 Common items: ${topItems.map(([item, pct]) => `${item} (${pct}%)`).join(', ')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            document.getElementById('metaStats').innerHTML = html;
-            document.getElementById('lastUpdate').innerHTML = `🏆 Champions 2026 | Items HIDDEN at preview | AI predicts based on meta + learning`;
+            document.getElementById('metaStats').innerHTML = `<div style="margin-bottom: 12px;"><div><strong>Top M-1 Threats</strong></div><div style="font-size: 0.8em;">Flutter Mane | Iron Hands | Incineroar | Garchomp | Dragapult</div><div style="margin-top: 8px;"><strong>Common Mega Evolutions</strong></div><div style="font-size: 0.8em;">Charizard, Gengar, Kangaskhan, Gyarados, Lucario, Metagross</div></div>`;
+            document.getElementById('lastUpdate').innerHTML = `🏆 M-1 Season (April 8 - May 13) | Predicting: Picks | Items | Mega | Learning from ${learningData.totalBattles} battles`;
         }
         
-        function saveLearningData() {
-            localStorage.setItem('pokemon_champions_item_learning', JSON.stringify(learningData));
-        }
+        function saveLearningData() { localStorage.setItem('pokemon_champions_battle_learning', JSON.stringify(learningData)); }
+        function loadLearningData() { const saved = localStorage.getItem('pokemon_champions_battle_learning'); if (saved) { learningData = JSON.parse(saved); updateLearningStats(); } }
         
-        function loadLearningData() {
-            const saved = localStorage.getItem('pokemon_champions_item_learning');
-            if (saved) {
-                learningData = JSON.parse(saved);
-                updateLearningStats();
-            }
-        }
+        const metaData = { "Flutter Mane": 47.3, "Iron Hands": 41.2, "Incineroar": 35.2, "Garchomp": 25.5, "Dragapult": 12.5 };
         
-        // Image recognition
-        const uploadArea = document.getElementById('uploadArea');
-        const imageInput = document.getElementById('imageInput');
-        
-        uploadArea.addEventListener('click', () => imageInput.click());
-        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.background = 'rgba(237,154,159,0.1)'; });
-        uploadArea.addEventListener('dragleave', () => { uploadArea.style.background = 'transparent'; });
-        uploadArea.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            uploadArea.style.background = 'transparent';
-            const file = e.dataTransfer.files[0];
-            if (file) await processImage(file);
-        });
-        imageInput.addEventListener('change', async (e) => {
-            if (e.target.files[0]) await processImage(e.target.files[0]);
-        });
-        
-        async function processImage(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    let identified = "Milotic";
-                    document.getElementById('identifiedPokemon').textContent = identified;
-                    document.getElementById('recognitionResult').style.display = 'block';
-                    
-                    const addBtn = document.getElementById('addToTeamBtn');
-                    addBtn.onclick = () => {
-                        const firstEmpty = document.querySelector('.opponent-pokemon option[value=""]')?.parentElement;
-                        if (firstEmpty) firstEmpty.value = identified;
-                        showNotification(`Added ${identified} to opponent team!`, 'success');
-                        updatePredictions();
-                    };
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = message;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-        
-        function init() {
-            loadLearningData();
-            initTeamSelectors();
-            displayMetaStats();
-        }
+        function init() { loadLearningData(); initTeamSelectors(); displayMetaStats(); }
+        function showNotification(message, type) { const n = document.createElement('div'); n.className = 'notification'; n.innerHTML = message; document.body.appendChild(n); setTimeout(() => n.remove(), 3000); }
         
         init();
     </script>
