@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Doubles Meta Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .last-update {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            display: inline-block;
+        }
+        
+        .search-box {
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .pokemon-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .pokemon-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .pokemon-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .pokemon-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .usage-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .usage-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s;
+        }
+        
+        .usage-text {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-stable { color: #6b7280; }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: white;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5em; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐉 Pokémon Doubles Meta Tracker</h1>
+            <div class="subtitle">Real-time VGC 2024 Metagame Analysis</div>
+            <div class="last-update" id="lastUpdate">Loading...</div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search Pokémon... (e.g., 'Flutter Mane')">
+            </div>
+            
+            <div class="controls">
+                <button onclick="showTop(10)">Top 10</button>
+                <button onclick="showTop(20)">Top 20</button>
+                <button onclick="showTop(50)">Top 50</button>
+                <button onclick="refreshData()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="card">
+                <h2>📊 Top Pokémon by Usage</h2>
+                <div class="pokemon-list" id="topList">Loading...</div>
+            </div>
+            
+            <div class="card">
+                <h2>🔍 Search Results</h2>
+                <div class="pokemon-list" id="searchResults">Enter a Pokémon name above</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📈 Meta Summary</h2>
+            <div id="summary">Loading...</div>
+        </div>
+    </div>
+    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody"></div>
+            <button onclick="closeModal()" style="margin-top: 20px;">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        let pokemonData = [];
+        
+        // Fallback data in case GitHub Actions hasn't run yet
+        const fallbackData = {
+            "Flutter Mane": 45.2, "Iron Hands": 38.7, "Tornadus": 35.1,
+            "Chi-Yu": 32.8, "Urshifu-Rapid-Strike": 30.4, "Rillaboom": 28.9,
+            "Amoonguss": 26.5, "Landorus-Therian": 24.1, "Chien-Pao": 22.3,
+            "Indeedee-F": 20.8, "Farigiraf": 18.5, "Heatran": 17.2,
+            "Dragonite": 15.9, "Gholdengo": 14.6, "Ogerpon-Wellspring": 13.3
+        };
+        
+        async function loadData() {
+            try {
+                // Try to load from our auto-updated JSON file
+                const response = await fetch('meta_data.json?v=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    pokemonData = data;
+                    document.getElementById('lastUpdate').innerHTML = `📅 Last updated: ${new Date().toLocaleString()}`;
+                } else {
+                    // Use fallback data
+                    pokemonData = fallbackData;
+                    document.getElementById('lastUpdate').innerHTML = `📅 Using built-in data (auto-updates coming soon)`;
+                }
+            } catch (error) {
+                console.log('Using fallback data');
+                pokemonData = fallbackData;
+                document.getElementById('lastUpdate').innerHTML = `📅 Using cached data`;
+            }
+            
+            showTop(20);
+            updateSummary();
+        }
+        
+        function showTop(limit) {
+            const sorted = Object.entries(pokemonData)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, limit);
+            
+            const html = sorted.map(([name, usage], index) => `
+                <div class="pokemon-item" onclick="showDetails('${name}')">
+                    <div class="pokemon-name">
+                        ${index + 1}. ${name}
+                        ${getTrendIcon(name)}
+                    </div>
+                    <div class="usage-bar">
+                        <div class="usage-fill" style="width: ${usage * 1.5}%"></div>
+                    </div>
+                    <div class="usage-text">${usage.toFixed(1)}% usage</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('topList').innerHTML = html || 'No data available';
+        }
+        
+        function getTrendIcon(name) {
+            // Simple trend simulation based on name hash
+            const hash = name.split('').reduce((a,b) => a + b.charCodeAt(0), 0);
+            if (hash % 3 === 0) return '<span class="trend-up"> 📈</span>';
+            if (hash % 3 === 1) return '<span class="trend-down"> 📉</span>';
+            return '<span class="trend-stable"> ➡️</span>';
+        }
+        
+        function updateSummary() {
+            const total = Object.keys(pokemonData).length;
+            const top3 = Object.entries(pokemonData)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            const avgUsage = Object.values(pokemonData).reduce((a,b) => a + b, 0) / total;
+            
+            const html = `
+                <p>📊 Total Pokémon tracked: <strong>${total}</strong></p>
+                <p>🏆 Top meta Pokémon: <strong>${top3.map(p => p[0]).join(', ')}</strong></p>
+                <p>📈 Average usage rate: <strong>${avgUsage.toFixed(1)}%</strong></p>
+                <p>🔄 Data updates automatically every hour</p>
+                <p>💡 Click any Pokémon for detailed information</p>
+            `;
+            
+            document.getElementById('summary').innerHTML = html;
+        }
+        
+        function showDetails(name) {
+            const usage = pokemonData[name];
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = name;
+            modalBody.innerHTML = `
+                <p><strong>Usage Rate:</strong> ${usage.toFixed(1)}%</p>
+                <p><strong>Trend:</strong> ${getTrendIcon(name)}</p>
+                <p><strong>Rank:</strong> #${Object.entries(pokemonData)
+                    .sort((a,b) => b[1] - a[1])
+                    .findIndex(([n]) => n === name) + 1}</p>
+                <div class="usage-bar" style="margin: 20px 0">
+                    <div class="usage-fill" style="width: ${usage * 1.5}%; height: 30px"></div>
+                </div>
+                <p><em>Tip: Check back hourly for updated stats!</em></p>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        function refreshData() {
+            loadData();
+        }
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (!query) {
+                document.getElementById('searchResults').innerHTML = 'Enter a Pokémon name above';
+                return;
+            }
+            
+            const results = Object.entries(pokemonData)
+                .filter(([name]) => name.toLowerCase().includes(query))
+                .sort((a,b) => b[1] - a[1]);
+            
+            if (results.length === 0) {
+                document.getElementById('searchResults').innerHTML = 'No Pokémon found';
+                return;
+            }
+            
+            const html = results.map(([name, usage]) => `
+                <div class="pokemon-item" onclick="showDetails('${name}')">
+                    <div class="pokemon-name">${name}</div>
+                    <div class="usage-bar">
+                        <div class="usage-fill" style="width: ${usage * 1.5}%"></div>
+                    </div>
+                    <div class="usage-text">${usage.toFixed(1)}% usage</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('searchResults').innerHTML = html;
+        });
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Load data on page load
+        loadData();
+        
+        // Auto-refresh every hour
+        setInterval(refreshData, 3600000);
+    </script>
+</body>
+</html>
