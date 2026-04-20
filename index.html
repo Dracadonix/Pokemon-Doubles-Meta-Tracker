@@ -1,659 +1,656 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokémon Champions | Doubles Battle Predictor | M-1 Season</title>
-    <style>
-        :root {
-            --milotic-cream: #FCEEC8;
-            --milotic-pink: #ED9A9F;
-            --milotic-blue: #AFD4E8;
-            --milotic-dark: #5B8CBF;
-            --milotic-gold: #F5D742;
-            --milotic-pearl: #FFF5E6;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--milotic-pink) 0%, var(--milotic-blue) 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container { max-width: 1600px; margin: 0 auto; }
-        
-        .header {
-            background: var(--milotic-pearl);
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 25px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            font-size: 2em;
-            background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-dark));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-dark));
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin: 5px;
-        }
-        
-        .warning-badge { background: #f59e0b; color: #333; }
-        .mega-badge { background: #8b5cf6; }
-        
-        .analyzer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-        
-        .team-card {
-            background: var(--milotic-pearl);
-            border-radius: 25px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .team-header {
-            font-size: 1.3em;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid var(--milotic-pink);
-            color: var(--milotic-dark);
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .pokemon-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding: 10px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 15px;
-        }
-        
-        .pokemon-slot select, .pokemon-slot input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid var(--milotic-blue);
-            border-radius: 12px;
-            font-size: 14px;
-        }
-        
-        .hidden-item {
-            font-size: 0.75em;
-            color: #999;
-            text-align: center;
-            padding: 5px;
-            background: #f0f0f0;
-            border-radius: 10px;
-        }
-        
-        .predictions-card {
-            background: var(--milotic-pearl);
-            border-radius: 25px;
-            padding: 25px;
-            margin-top: 20px;
-        }
-        
-        .prediction-item {
-            background: linear-gradient(135deg, var(--milotic-cream) 0%, white 100%);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 15px;
-            border-left: 5px solid var(--milotic-pink);
-        }
-        
-        .prediction-high { border-left-color: #10b981; background: #f0fdf4; }
-        .prediction-medium { border-left-color: #f59e0b; background: #fefce8; }
-        
-        .prediction-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .prediction-pokemon { font-size: 1.1em; font-weight: bold; color: var(--milotic-dark); }
-        
-        .item-guess {
-            display: inline-block;
-            background: var(--milotic-gold);
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            margin: 3px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .item-guess:hover { transform: scale(1.05); background: var(--milotic-pink); color: white; }
-        
-        .revealed-item { background: #10b981; color: white; padding: 3px 10px; border-radius: 15px; display: inline-block; font-size: 0.8em; }
-        
-        .learning-stats {
-            background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-blue));
-            color: white;
-            padding: 20px;
-            border-radius: 20px;
-            margin-top: 20px;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin-top: 10px;
-        }
-        
-        .stat-box { text-align: center; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 15px; }
-        .stat-number { font-size: 1.5em; font-weight: bold; }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary { background: linear-gradient(135deg, var(--milotic-pink), var(--milotic-dark)); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-warning { background: #f59e0b; color: white; }
-        .btn:hover { transform: translateY(-2px); }
-        
-        .action-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 12px 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-            border-left: 5px solid var(--milotic-pink);
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .image-upload-card {
-            background: var(--milotic-pearl);
-            border-radius: 25px;
-            padding: 20px;
-            margin-bottom: 25px;
-            text-align: center;
-            border: 2px dashed var(--milotic-pink);
-        }
-        
-        .upload-area { cursor: pointer; padding: 30px; transition: all 0.3s; }
-        .upload-area.drag-over { background: rgba(237,154,159,0.2); border-radius: 20px; }
-        .preview-image { max-width: 200px; max-height: 200px; margin: 10px auto; border-radius: 15px; display: none; }
-        
-        .prediction-summary {
-            background: linear-gradient(135deg, var(--milotic-dark), var(--milotic-pink));
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .analyzer-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 1.3em; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champions Doubles Tracker — M-1 Season</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#D85A30;--red2:#993C1D;--red-l:#FAECE7;
+  --blue:#378ADD;--blue-l:#E6F1FB;--blue-dk:#042C53;
+  --teal:#1D9E75;--teal-l:#E1F5EE;--teal-dk:#04342C;
+  --amber:#BA7517;--amber-l:#FAEEDA;
+  --gray1:#F1EFE8;--gray2:#D3D1C7;--gray3:#888780;--gray4:#2C2C2A;
+  --bg:#0f0f13;--bg2:#18181f;--bg3:#22222c;--bg4:#2c2c38;
+  --txt:#f0eff8;--txt2:#9999aa;--txt3:#55556a;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  font-family:'Barlow',sans-serif;
+}
+body{background:var(--bg);color:var(--txt);min-height:100vh}
+.wrap{max-width:860px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:14px;margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border2)}
+.hdr-ball{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--red) 50%,white 50%);border:3px solid white;position:relative;box-shadow:0 0 16px rgba(216,90,48,0.4);flex-shrink:0}
+.hdr-ball::after{content:'';position:absolute;width:8px;height:8px;border-radius:50%;background:white;border:2px solid var(--red2);top:50%;left:50%;transform:translate(-50%,-50%)}
+.hdr-txt h1{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:1px;text-transform:uppercase;color:var(--txt)}
+.hdr-txt p{font-size:12px;color:var(--txt2);margin-top:1px}
+.season-pill{margin-left:auto;background:var(--red-l);color:var(--red);font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;white-space:nowrap;border:1px solid var(--red)}
+
+/* TABS */
+.tabs{display:flex;gap:3px;margin-bottom:1.5rem;background:var(--bg2);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.tab{flex:1;padding:9px 0;font-size:13px;font-weight:500;text-align:center;border:none;background:transparent;color:var(--txt2);cursor:pointer;border-radius:7px;transition:all 0.15s;font-family:'Barlow',sans-serif}
+.tab.active{background:var(--bg4);color:var(--txt);border:1px solid var(--border2)}
+.panel{display:none}.panel.active{display:block}
+
+/* GRID UTIL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem}
+
+/* TEAM BOXES */
+.team-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px}
+.team-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif}
+.lbl-opp{color:var(--red)}.lbl-me{color:var(--blue)}
+.team-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.slot{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 4px 6px;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color 0.12s}
+.slot.filled{cursor:pointer}.slot.filled:hover{border-color:var(--border2)}
+.slot-x{position:absolute;top:3px;right:5px;font-size:10px;color:var(--txt3);background:none;border:none;cursor:pointer;opacity:0;transition:opacity 0.1s;color:var(--txt2);line-height:1;padding:0}
+.slot:hover .slot-x{opacity:1}
+.slot img{width:42px;height:42px;object-fit:contain;image-rendering:pixelated}
+.slot-name{font-size:9px;font-weight:500;color:var(--txt2);text-align:center;line-height:1.2;margin-top:1px}
+.slot-item{font-size:8px;color:var(--txt3);text-align:center;white-space:nowrap;overflow:hidden;max-width:100%}
+.slot-empty{font-size:18px;color:var(--txt3)}
+.slot-mega{font-size:7px;font-weight:700;color:var(--amber);letter-spacing:0.5px}
+
+/* SEARCH ROW */
+.search-row{display:flex;gap:8px;margin-bottom:10px}
+.search-row input{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;font-family:'Barlow',sans-serif;outline:none}
+.search-row input:focus{border-color:var(--red)}
+.search-row select{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--txt2);font-size:12px;font-family:'Barlow',sans-serif;outline:none;cursor:pointer;min-width:90px}
+.search-row select:focus{border-color:var(--blue)}
+
+/* POKEMON GRID */
+.poke-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:5px;max-height:264px;overflow-y:auto;padding:2px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent}
+.poke-grid::-webkit-scrollbar{width:4px}
+.poke-grid::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+.pb{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 3px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;transition:all 0.12s}
+.pb:hover{border-color:var(--border2);background:var(--bg3)}
+.pb.sel-opp{border-color:var(--red);background:rgba(216,90,48,0.12)}
+.pb.sel-me{border-color:var(--blue);background:rgba(55,138,221,0.12)}
+.pb.dis{opacity:0.3;pointer-events:none}
+.pb img{width:46px;height:46px;object-fit:contain;image-rendering:pixelated}
+.pb-name{font-size:9px;font-weight:500;text-align:center;color:var(--txt2);line-height:1.2}
+.tier-badge{position:absolute;top:3px;right:4px;font-size:8px;font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.3px}
+.t-S{color:#ff6b47}.t-Ap{color:#e0a030}.t-A{color:var(--teal)}.t-B{color:var(--blue)}.t-C{color:var(--txt3)}
+
+/* PREDICT BUTTON */
+.predict-btn{width:100%;padding:11px;background:var(--red);color:white;border:none;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s;margin:1.25rem 0 1rem;box-shadow:0 4px 20px rgba(216,90,48,0.3)}
+.predict-btn:hover{background:var(--red2);box-shadow:0 4px 28px rgba(216,90,48,0.5)}
+.predict-btn:disabled{opacity:0.35;cursor:default;box-shadow:none}
+
+/* PREDICTIONS */
+.bring4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.bcard{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:border-color 0.12s}
+.bcard.confirmed{border-color:var(--teal);background:rgba(29,158,117,0.1)}
+.bcard img{width:46px;height:46px;object-fit:contain;image-rendering:pixelated}
+.bcard-name{font-size:10px;font-weight:600;color:var(--txt);text-align:center;line-height:1.2}
+.bcard-item{font-size:9px;color:var(--txt2);text-align:center}
+.bcard-mega{font-size:9px;font-weight:700;color:var(--amber);font-family:'Barlow Condensed',sans-serif}
+.bcard-prob{font-size:10px;font-weight:700;color:var(--txt3);font-family:'Barlow Condensed',sans-serif}
+.item-toggle{width:100%;padding:3px 0;font-size:9px;background:transparent;border:1px solid var(--border2);border-radius:5px;cursor:pointer;font-family:'Barlow',sans-serif;color:var(--txt2);margin-top:2px;transition:all 0.12s}
+.item-toggle:hover{background:var(--bg3)}
+.item-toggle.conf{background:rgba(29,158,117,0.2);border-color:var(--teal);color:#4de8b4}
+.action-row{display:flex;gap:8px;margin-bottom:1.5rem}
+.action-row button{flex:1;padding:9px;font-size:13px;font-weight:500;font-family:'Barlow',sans-serif;border-radius:8px;cursor:pointer;transition:all 0.12s}
+.btn-conf{background:rgba(29,158,117,0.15);color:#4de8b4;border:1px solid var(--teal)}
+.btn-conf:hover{background:rgba(29,158,117,0.3)}
+.btn-new{background:var(--bg3);color:var(--txt2);border:1px solid var(--border2)}
+.btn-new:hover{background:var(--bg4)}
+.empty-state{text-align:center;padding:2rem;color:var(--txt3);font-size:13px;background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;line-height:1.7}
+.pred-section-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt3);margin-bottom:10px;font-family:'Barlow Condensed',sans-serif}
+
+/* META */
+.meta-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.fpill{padding:5px 13px;font-size:12px;font-weight:500;border:1px solid var(--border2);border-radius:20px;background:transparent;cursor:pointer;color:var(--txt2);font-family:'Barlow',sans-serif;transition:all 0.12s}
+.fpill.active{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+.fpill:hover:not(.active){background:var(--bg3)}
+.meta-list{display:flex;flex-direction:column;gap:5px}
+.mrow{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;transition:border-color 0.12s}
+.mrow:hover{border-color:var(--border2)}
+.mrank{font-size:11px;font-weight:700;color:var(--txt3);font-family:'Barlow Condensed',sans-serif;width:22px;text-align:right;flex-shrink:0}
+.mrow img{width:38px;height:38px;object-fit:contain;image-rendering:pixelated;flex-shrink:0}
+.minfo{flex:1;min-width:0}
+.mname{font-size:13px;font-weight:500;color:var(--txt)}
+.mrole{font-size:11px;color:var(--txt2)}
+.mbar-wrap{width:110px;flex-shrink:0}
+.mbar-bg{background:var(--bg3);border-radius:4px;height:5px;overflow:hidden}
+.mbar-fill{height:5px;border-radius:4px;background:var(--red);transition:width 0.5s}
+.mpct{font-size:11px;color:var(--txt2);font-weight:500;font-family:'Barlow Condensed',sans-serif;text-align:right;margin-top:2px}
+.tier-chip{font-size:10px;font-weight:800;font-family:'Barlow Condensed',sans-serif;padding:3px 8px;border-radius:5px;flex-shrink:0}
+.chip-S{background:rgba(255,107,71,0.15);color:#ff6b47;border:1px solid rgba(255,107,71,0.3)}
+.chip-Ap{background:rgba(186,117,23,0.15);color:#e0a030;border:1px solid rgba(186,117,23,0.3)}
+.chip-A{background:rgba(29,158,117,0.15);color:var(--teal);border:1px solid rgba(29,158,117,0.3)}
+.chip-B{background:rgba(55,138,221,0.15);color:var(--blue);border:1px solid rgba(55,138,221,0.3)}
+.chip-C{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
+
+/* LOG */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.25rem}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.snum{font-size:28px;font-weight:700;color:var(--txt);font-family:'Barlow Condensed',sans-serif;line-height:1}
+.slbl{font-size:11px;color:var(--txt2);margin-top:4px}
+.log-form{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:1rem}
+.log-form label{font-size:12px;color:var(--txt2);display:block;margin-bottom:5px;font-weight:500}
+.log-form input,.log-form textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--txt);font-size:13px;font-family:'Barlow',sans-serif;outline:none;margin-bottom:10px}
+.log-form input:focus,.log-form textarea:focus{border-color:var(--blue)}
+.log-form textarea{height:52px;resize:none}
+.result-btns{display:flex;gap:6px;margin-bottom:12px}
+.rbtn{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;text-transform:uppercase;border:1px solid var(--border2);background:transparent;color:var(--txt2);transition:all 0.12s}
+.rbtn.win-on{background:rgba(29,158,117,0.2);border-color:var(--teal);color:#4de8b4}
+.rbtn.loss-on{background:rgba(216,90,48,0.2);border-color:var(--red);color:#ff8a6b}
+.log-submit{width:100%;padding:10px;background:var(--txt);color:var(--bg);border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;text-transform:uppercase;transition:opacity 0.15s}
+.log-submit:hover{opacity:0.85}
+.log-entries{display:flex;flex-direction:column;gap:6px}
+.lentry{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;display:flex;align-items:flex-start;gap:10px}
+.rdot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px}
+.rdot.w{background:rgba(29,158,117,0.2);color:#4de8b4;border:1px solid rgba(29,158,117,0.3)}
+.rdot.l{background:rgba(216,90,48,0.2);color:#ff8a6b;border:1px solid rgba(216,90,48,0.3)}
+.linfo{flex:1;min-width:0}
+.lopp{font-size:13px;font-weight:500;color:var(--txt)}
+.lpicks{font-size:11px;color:var(--txt2);margin-top:1px}
+.lnote{font-size:11px;color:var(--txt3);margin-top:3px;font-style:italic}
+.ldate{font-size:10px;color:var(--txt3);flex-shrink:0;margin-top:1px}
+
+/* SECTION HEADER */
+.section-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt3);margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;display:flex;align-items:center;gap:8px}
+.section-h::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* COUNTERS */
+.count-badge{font-size:11px;font-weight:600;color:var(--txt3);font-family:'Barlow Condensed',sans-serif;background:var(--bg3);padding:2px 8px;border-radius:10px;border:1px solid var(--border)}
+
+/* SCROLLBAR */
+html{scrollbar-width:thin;scrollbar-color:var(--bg4) var(--bg)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div>
-                <span class="badge">✨ SHINY MILOTIC EDITION ✨</span>
-                <span class="badge">🏆 POKÉMON CHAMPIONS 2026</span>
-                <span class="badge warning-badge">🎯 DOUBLES BATTLE PREDICTOR</span>
-                <span class="badge mega-badge">⚡ M-1 SEASON</span>
-            </div>
-            <h1>🐉 Champions Doubles Battle Predictor</h1>
-            <div class="subtitle" style="color: #666;">Predicts: Which 4 they'll bring | Their items | Who will Mega Evolve | Learns from every battle</div>
-            <div class="last-update" id="lastUpdate">Loading M-1 roster...</div>
-        </div>
-        
-        <!-- Image Upload -->
-        <div class="image-upload-card">
-            <h3>📸 Identify Pokémon from Image</h3>
-            <div class="upload-area" id="uploadArea">
-                <div style="font-size: 3em;">📷</div>
-                <p>Click or drag & drop a Pokémon image here</p>
-                <input type="file" id="imageInput" accept="image/*" style="display: none;">
-            </div>
-            <img id="previewImg" class="preview-image" alt="Preview">
-            <div id="recognitionResult" style="display: none; margin-top: 15px;">
-                <div style="background: linear-gradient(135deg, var(--milotic-cream), white); padding: 15px; border-radius: 20px;">
-                    <div style="font-size: 0.8em; color: #666;">🔍 IDENTIFIED</div>
-                    <div style="font-size: 1.5em; font-weight: bold; color: var(--milotic-dark);" id="identifiedPokemon">-</div>
-                    <div class="confidence-bar" style="background: #e0e0e0; height: 8px; border-radius: 4px; margin: 10px 0;">
-                        <div id="confidenceFill" style="background: linear-gradient(90deg, var(--milotic-pink), var(--milotic-dark)); height: 100%; border-radius: 4px; width: 0%;"></div>
-                    </div>
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                        <button class="btn-primary" id="addToOpponentBtn" style="padding: 6px 15px;">+ Opponent Team</button>
-                        <button class="btn-primary" id="addToOwnBtn" style="padding: 6px 15px;">+ My Team</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="analyzer-grid">
-            <div class="team-card">
-                <div class="team-header">
-                    <span>🌟 YOUR TEAM</span>
-                    <span>6 Pokémon (You know your items)</span>
-                </div>
-                <div id="yourTeamContainer"></div>
-            </div>
-            
-            <div class="team-card">
-                <div class="team-header">
-                    <span>👥 OPPONENT'S TEAM</span>
-                    <span>❓ Items & picks HIDDEN</span>
-                </div>
-                <div id="opponentTeamContainer"></div>
-                <div style="margin-top: 10px; font-size: 0.7em; color: #f59e0b; text-align: center;">
-                    🔍 You see their 6 Pokémon at team preview<br>
-                    🎯 AI predicts which 4 they'll bring, their items, and Mega
-                </div>
-            </div>
-        </div>
-        
-        <!-- AI Predictions -->
-        <div class="predictions-card" id="predictionsCard" style="display: none;">
-            <div class="prediction-summary" id="predictionSummary"></div>
-            <h2>🤖 Battle Predictions</h2>
-            <p style="color: #666; margin-bottom: 15px;">
-                🎯 <strong>Bring 6, Choose 4</strong> - Predicting opponent's 4 picks, items, and Mega Evolution<br>
-                💡 Click on an item to confirm what they ACTUALLY had in battle
-            </p>
-            <div id="predictionsList"></div>
-            <div class="learning-stats" id="learningStats"></div>
-            <div class="action-buttons">
-                <button class="btn btn-success" onclick="finishBattle()">✓ Confirm & Learn (All 4 picks)</button>
-                <button class="btn btn-warning" onclick="resetBattle()">🔄 New Battle</button>
-            </div>
-        </div>
-        
-        <!-- Meta Stats -->
-        <div class="predictions-card">
-            <h2>📊 M-1 Doubles Meta Stats</h2>
-            <div id="metaStats"></div>
-        </div>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-ball"></div>
+  <div class="hdr-txt">
+    <h1>Champions Doubles Tracker</h1>
+    <p>Predict · Track · Learn — Regulation M-A</p>
+  </div>
+  <span class="season-pill">M-1 SEASON</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('predict',this)">Battle Predictor</button>
+  <button class="tab" onclick="switchTab('meta',this)">Meta Stats</button>
+  <button class="tab" onclick="switchTab('log',this)">Match Log</button>
+</div>
+
+<!-- PREDICT TAB -->
+<div id="tab-predict" class="panel active">
+  <div class="two-col">
+    <div class="team-box">
+      <div class="team-lbl lbl-opp">Opponent Team (6 seen)</div>
+      <div class="team-slots" id="opp-slots"></div>
     </div>
-    
-    <script>
-        // ===== VERIFIED POKÉMON CHAMPIONS SEASON M-1 ROSTER =====
-        const pokemonList = [
-            "Venusaur", "Charizard", "Blastoise", "Beedrill", "Pidgeot", "Arbok", "Pikachu", "Raichu",
-            "Alolan Raichu", "Clefable", "Ninetales", "Alolan Ninetales", "Arcanine", "Hisuian Arcanine",
-            "Alakazam", "Machamp", "Victreebel", "Slowbro", "Galarian Slowbro", "Gengar", "Kangaskhan",
-            "Starmie", "Pinsir", "Tauros", "Paldean Tauros Combat", "Paldean Tauros Blaze", "Paldean Tauros Aqua",
-            "Gyarados", "Ditto", "Vaporeon", "Jolteon", "Flareon", "Aerodactyl", "Snorlax", "Dragonite",
-            "Meganium", "Typhlosion", "Hisuian Typhlosion", "Feraligatr", "Ariados", "Ampharos", "Azumarill",
-            "Politoed", "Espeon", "Umbreon", "Slowking", "Galarian Slowking", "Forretress", "Steelix",
-            "Scizor", "Heracross", "Skarmory", "Houndoom", "Tyranitar", "Pelipper", "Gardevoir", "Sableye",
-            "Aggron", "Medicham", "Manectric", "Sharpedo", "Camerupt", "Torkoal", "Altaria", "Milotic",
-            "Castform", "Banette", "Chimecho", "Absol", "Glalie", "Metagross", "Plusle", "Minun",
-            "Torterra", "Infernape", "Empoleon", "Luxray", "Roserade", "Rampardos", "Bastiodon", "Lopunny",
-            "Spiritomb", "Garchomp", "Lucario", "Hippowdon", "Toxicroak", "Abomasnow", "Weavile", "Rhyperior",
-            "Leafeon", "Glaceon", "Gliscor", "Mamoswine", "Gallade", "Froslass", "Rotom", "Uxie", "Mesprit", "Azelf",
-            "Serperior", "Emboar", "Samurott", "Hisuian Samurott", "Watchog", "Liepard", "Simisage", "Simisear",
-            "Simipour", "Excadrill", "Audino", "Conkeldurr", "Whimsicott", "Krookodile", "Cofagrigus", "Garbodor",
-            "Zoroark", "Hisuian Zoroark", "Reuniclus", "Vanilluxe", "Emolga", "Chandelure", "Beartic", "Stunfisk",
-            "Galarian Stunfisk", "Golurk", "Hydreigon", "Volcarona", "Chesnaught", "Delphox", "Greninja", "Diggersby",
-            "Talonflame", "Vivillon", "Floette", "Florges", "Pangoro", "Furfrou", "Meowstic", "Aegislash",
-            "Aromatisse", "Slurpuff", "Clawitzer", "Heliolisk", "Tyrantrum", "Aurorus", "Sylveon", "Hawlucha",
-            "Dedenne", "Goodra", "Hisuian Goodra", "Klefki", "Trevenant", "Gourgeist", "Avalugg", "Hisuian Avalugg",
-            "Noivern", "Decidueye", "Hisuian Decidueye", "Incineroar", "Primarina", "Toucannon", "Crabominable",
-            "Lycanroc Midday", "Lycanroc Midnight", "Lycanroc Dusk", "Toxapex", "Mudsdale", "Araquanid", "Salazzle",
-            "Tsareena", "Oranguru", "Passimian", "Mimikyu", "Drampa", "Kommo-o", "Corviknight", "Flapple", "Appletun",
-            "Sandaconda", "Polteageist", "Hatterene", "Mr Rime", "Runerigus", "Alcremie", "Morpeko", "Dragapult",
-            "Wyrdeer", "Kleavor", "Basculegion", "Sneasler", "Meowscarada", "Skeledirge", "Quaquaval", "Maushold",
-            "Garganacl", "Armarouge", "Ceruledge", "Bellibolt", "Scovillain", "Espathra", "Tinkaton", "Palafin",
-            "Orthworm", "Glimmora", "Farigiraf", "Kingambit", "Wo-Chien", "Chien-Pao", "Ting-Lu", "Chi-Yu",
-            "Sinistcha", "Archaludon", "Hydrapple", "Ogerpon", "Terapagos", "Pecharunt"
-        ];
-        
-        // M-1 Mega Evolution list
-        const megaPokemon = [
-            "Venusaur", "Charizard", "Blastoise", "Beedrill", "Pidgeot", "Clefable", "Alakazam",
-            "Victreebel", "Slowbro", "Gengar", "Kangaskhan", "Starmie", "Pinsir", "Gyarados",
-            "Aerodactyl", "Dragonite", "Meganium", "Feraligatr", "Ampharos", "Steelix", "Scizor",
-            "Heracross", "Skarmory", "Houndoom", "Tyranitar", "Gardevoir", "Sableye", "Aggron",
-            "Medicham", "Manectric", "Sharpedo", "Camerupt", "Altaria", "Banette", "Chimecho",
-            "Absol", "Glalie", "Metagross", "Lopunny", "Garchomp", "Lucario", "Abomasnow", "Gallade",
-            "Froslass", "Emboar", "Excadrill", "Audino", "Chandelure", "Golurk", "Chesnaught",
-            "Delphox", "Greninja", "Floette", "Meowstic", "Hawlucha", "Crabominable", "Drampa",
-            "Scovillain", "Glimmora"
-        ];
-        
-        const itemList = [
-            "Sitrus Berry", "Leftovers", "Choice Scarf", "Choice Band", "Choice Specs",
-            "Assault Vest", "Life Orb", "Focus Sash", "Weakness Policy", "Booster Energy",
-            "Covert Cloak", "Clear Amulet", "Safety Goggles", "Mental Herb", "Lum Berry"
-        ];
-        
-        // Color profiles for image recognition
-        const colorProfiles = {
-            "Charizard": { r: 220, g: 80, b: 60, range: 40 },
-            "Venusaur": { r: 60, g: 120, b: 60, range: 35 },
-            "Blastoise": { r: 60, g: 100, b: 180, range: 40 },
-            "Gengar": { r: 120, g: 60, b: 140, range: 35 },
-            "Gyarados": { r: 60, g: 100, b: 180, range: 35 },
-            "Dragonite": { r: 200, g: 140, b: 60, range: 40 },
-            "Lucario": { r: 60, g: 100, b: 160, range: 35 },
-            "Milotic": { r: 200, g: 150, b: 180, range: 45 },
-            "Pikachu": { r: 240, g: 200, b: 60, range: 40 },
-            "Incineroar": { r: 180, g: 60, b: 60, range: 35 },
-            "Garchomp": { r: 100, g: 60, b: 140, range: 35 },
-            "Metagross": { r: 60, g: 100, b: 160, range: 35 }
-        };
-        
-        let learningData = { patterns: {}, itemAccuracy: { correct: 0, total: 0 }, pickAccuracy: { correct: 0, total: 0 }, totalBattles: 0 };
-        let currentBattle = { yourTeam: [], opponentTeam: [], predictions: [], actualPicks: [] };
-        
-        // ===== IMAGE IDENTIFIER =====
-        function analyzeImageColors(imageData, width, height) {
-            let r = 0, g = 0, b = 0, count = 0;
-            for (let y = 0; y < height; y += 10) {
-                for (let x = 0; x < width; x += 10) {
-                    const idx = (y * width + x) * 4;
-                    if (idx + 2 < imageData.length) {
-                        r += imageData[idx]; g += imageData[idx + 1]; b += imageData[idx + 2]; count++;
-                    }
-                }
-            }
-            return { r: r / count, g: g / count, b: b / count };
-        }
-        
-        function identifyPokemonByColor(r, g, b) {
-            let bestMatch = null, bestScore = 0;
-            for (const [name, profile] of Object.entries(colorProfiles)) {
-                const distance = Math.sqrt(Math.pow(r - profile.r, 2) + Math.pow(g - profile.g, 2) + Math.pow(b - profile.b, 2));
-                const score = Math.max(0, 100 - (distance / 2.5));
-                if (score > bestScore && score > 30) { bestScore = score; bestMatch = name; }
-            }
-            if (!bestMatch) {
-                if (r > 200 && g > 150 && b < 100) bestMatch = "Pikachu";
-                else if (r > 200 && g < 100 && b < 100) bestMatch = "Charizard";
-                else if (r < 100 && g > 100 && b > 150) bestMatch = "Blastoise";
-                else bestMatch = "Pikachu";
-                bestScore = 55;
-            }
-            return { pokemon: bestMatch, confidence: Math.round(bestScore) };
-        }
-        
-        async function processImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width; canvas.height = img.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0);
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                        const avgColor = analyzeImageColors(imageData, canvas.width, canvas.height);
-                        const result = identifyPokemonByColor(avgColor.r, avgColor.g, avgColor.b);
-                        if (!pokemonList.includes(result.pokemon)) result.pokemon = "Pikachu";
-                        resolve(result);
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        // Image upload handling
-        const uploadArea = document.getElementById('uploadArea');
-        const imageInput = document.getElementById('imageInput');
-        const previewImg = document.getElementById('previewImg');
-        
-        uploadArea.addEventListener('click', () => imageInput.click());
-        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
-        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('drag-over'); });
-        uploadArea.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-            if (e.dataTransfer.files[0]) await handleImageUpload(e.dataTransfer.files[0]);
-        });
-        imageInput.addEventListener('change', async (e) => { if (e.target.files[0]) await handleImageUpload(e.target.files[0]); });
-        
-        async function handleImageUpload(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) { previewImg.src = e.target.result; previewImg.style.display = 'block'; };
-            reader.readAsDataURL(file);
-            showNotification('🔍 Analyzing image...', 'info');
-            const result = await processImage(file);
-            document.getElementById('identifiedPokemon').textContent = result.pokemon;
-            document.getElementById('confidenceFill').style.width = `${result.confidence}%`;
-            document.getElementById('recognitionResult').style.display = 'block';
-            document.getElementById('addToOpponentBtn').onclick = () => addPokemonToTeam(result.pokemon, 'opponent');
-            document.getElementById('addToOwnBtn').onclick = () => addPokemonToTeam(result.pokemon, 'own');
-            showNotification(`✨ Identified: ${result.pokemon}!`, 'success');
-        }
-        
-        function addPokemonToTeam(pokemonName, team) {
-            const container = team === 'opponent' ? '#opponentTeamContainer' : '#yourTeamContainer';
-            const selector = team === 'opponent' ? '.opponent-pokemon' : '.your-pokemon';
-            const selects = document.querySelectorAll(`${container} ${selector}`);
-            for (let select of selects) {
-                if (!select.value) { select.value = pokemonName; updatePredictions(); showNotification(`➕ Added ${pokemonName}`, 'success'); return; }
-            }
-            showNotification(`⚠️ Team is full!`, 'warning');
-        }
-        
-        // Team management
-        function initTeamSelectors() {
-            const yourContainer = document.getElementById('yourTeamContainer');
-            const opponentContainer = document.getElementById('opponentTeamContainer');
-            const sortedPokemon = [...pokemonList].sort();
-            
-            for (let i = 0; i < 6; i++) {
-                const yourRow = document.createElement('div'); yourRow.className = 'pokemon-row';
-                yourRow.innerHTML = `<div class="pokemon-slot"><select class="your-pokemon" style="width:100%;"><option value="">Select Pokémon...</option>${sortedPokemon.map(p => `<option value="${p}">${p}${megaPokemon.includes(p) ? ' ⚡Mega' : ''}</option>`).join('')}</select></div><div class="pokemon-slot"><select class="your-item" style="width:100%;"><option value="">Your item...</option>${itemList.map(item => `<option value="${item}">${item}</option>`).join('')}</select></div>`;
-                yourContainer.appendChild(yourRow);
-                
-                const oppRow = document.createElement('div'); oppRow.className = 'pokemon-row';
-                oppRow.innerHTML = `<div class="pokemon-slot"><select class="opponent-pokemon" style="width:100%;"><option value="">Select Pokémon...</option>${sortedPokemon.map(p => `<option value="${p}">${p}${megaPokemon.includes(p) ? ' ⚡Mega' : ''}</option>`).join('')}</select></div><div class="hidden-item">❓ Item hidden | ?/4 will be brought</div>`;
-                opponentContainer.appendChild(oppRow);
-            }
-            document.querySelectorAll('.your-pokemon, .your-item, .opponent-pokemon').forEach(el => el.addEventListener('change', () => updatePredictions()));
-        }
-        
-        function getTeams() {
-            const yourTeam = [];
-            document.querySelectorAll('.your-pokemon').forEach((select, i) => { if (select.value) yourTeam.push({ pokemon: select.value, item: document.querySelectorAll('.your-item')[i]?.value || "Unknown", canMega: megaPokemon.includes(select.value) }); });
-            const opponentTeam = [];
-            document.querySelectorAll('.opponent-pokemon').forEach(select => { if (select.value) opponentTeam.push(select.value); });
-            return { yourTeam, opponentTeam };
-        }
-        
-        function predictBattle() {
-            const { yourTeam, opponentTeam } = getTeams();
-            if (opponentTeam.length < 4) { document.getElementById('predictionsCard').style.display = 'none'; return; }
-            
-            currentBattle.yourTeam = yourTeam;
-            currentBattle.opponentTeam = opponentTeam;
-            currentBattle.predictions = [];
-            currentBattle.actualPicks = [];
-            
-            // Predict which 4 they'll bring based on meta and your team
-            const bringScores = opponentTeam.map(pokemon => {
-                let score = 50;
-                const yourTeamKey = yourTeam.map(p => p.pokemon).sort().join(',');
-                const patternKey = `${yourTeamKey}|bring|${pokemon}`;
-                if (learningData.patterns[patternKey]) score += learningData.patterns[patternKey].bringRate * 40;
-                if (metaData[pokemon]) score += metaData[pokemon].usage / 2;
-                if (megaPokemon.includes(pokemon)) score += 10;
-                return { pokemon, bringScore: Math.min(100, score) };
-            });
-            
-            const sortedByBring = bringScores.sort((a,b) => b.bringScore - a.bringScore);
-            const predictedPicks = sortedByBring.slice(0,4);
-            
-            // Predict items for each
-            const predictions = opponentTeam.map(pokemon => {
-                let itemProbabilities = { "Sitrus Berry": 30, "Leftovers": 20, "Focus Sash": 15, "Other": 35 };
-                if (megaPokemon.includes(pokemon)) itemProbabilities["Mega Stone"] = 20;
-                
-                const yourTeamKey = yourTeam.map(p => p.pokemon).sort().join(',');
-                const patternKey = `${yourTeamKey}|item|${pokemon}`;
-                if (learningData.patterns[patternKey]) {
-                    for (const [item, count] of Object.entries(learningData.patterns[patternKey])) {
-                        if (item !== 'total') itemProbabilities[item] = (itemProbabilities[item] || 0) + count * 5;
-                    }
-                }
-                
-                let total = Object.values(itemProbabilities).reduce((a,b) => a + b, 0);
-                const sortedItems = Object.entries(itemProbabilities).sort((a,b) => b[1] - a[1]).slice(0, 4);
-                const isPredictedPick = predictedPicks.some(p => p.pokemon === pokemon);
-                
-                return {
-                    pokemon, isPredictedPick, bringConfidence: bringScores.find(b => b.pokemon === pokemon)?.bringScore || 50,
-                    predictedItem: sortedItems[0][0], possibleItems: sortedItems.map(([item, prob]) => ({ item, prob: Math.round((prob/total)*100) })),
-                    actualItem: null
-                };
-            });
-            
-            currentBattle.predictions = predictions;
-            displayPredictions(predictedPicks);
-            document.getElementById('predictionsCard').style.display = 'block';
-            updateLearningStats();
-        }
-        
-        function displayPredictions(predictedPicks) {
-            const summaryHtml = `
-                <div style="font-size: 1.1em;">🎯 PREDICTED 4 PICKS</div>
-                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 8px;">
-                    ${predictedPicks.map(p => `<span style="background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px;">${p.pokemon}</span>`).join('')}
-                </div>
-            `;
-            document.getElementById('predictionSummary').innerHTML = summaryHtml;
-            
-            const predictionsHtml = currentBattle.predictions.map(pred => {
-                const isConfirmed = pred.actualItem !== null;
-                const borderColor = pred.isPredictedPick ? 'prediction-high' : '';
-                
-                return `<div class="prediction-item ${borderColor}">
-                    <div class="prediction-header">
-                        <span class="prediction-pokemon">${pred.pokemon} ${megaPokemon.includes(pred.pokemon) ? '⚡' : ''} ${pred.isPredictedPick ? '🎯 (Predicted to bring)' : '📦 (Bench candidate)'}</span>
-                        ${isConfirmed ? `<span class="revealed-item">✓ Item: ${pred.actualItem}</span>` : `<span>Bring confidence: ${pred.bringConfidence}%</span>`}
-                    </div>
-                    ${!isConfirmed ? `<div><strong>🤖 Predicted item:</strong> ${pred.predictedItem}<br>
-                        ${pred.possibleItems.map(p => `<span class="item-guess" onclick="confirmItem('${pred.pokemon}', '${p.item}')">${p.item} (${p.prob}%)</span>`).join('')}
-                        <div style="margin-top: 8px;"><input type="text" id="customItem_${pred.pokemon.replace(/[^a-zA-Z]/g, '')}" placeholder="Type actual item..." style="padding: 4px; border-radius: 8px; border: 1px solid #ddd; width: 60%;">
-                        <button class="confirm-item-btn" onclick="confirmCustomItem('${pred.pokemon}')">Confirm Item</button></div></div>` : 
-                        `<div style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 10px;">✅ Confirmed: ${pred.pokemon} held ${pred.actualItem}</div>`}
-                </div>`;
-            }).join('');
-            
-            const confirmedCount = currentBattle.predictions.filter(p => p.actualItem !== null).length;
-            document.getElementById('predictionsList').innerHTML = predictionsHtml + `<div style="margin-top: 15px; padding: 12px; background: #e0f2fe; border-radius: 12px; text-align: center;">✅ ${confirmedCount}/6 items confirmed | ${confirmedCount >= 4 ? 'Click "Confirm & Learn" when all 4 picks are revealed!' : 'Confirm items as you see them in battle'}</div>`;
-        }
-        
-        function confirmItem(pokemon, item) {
-            const prediction = currentBattle.predictions.find(p => p.pokemon === pokemon);
-            if (prediction && !prediction.actualItem) { prediction.actualItem = item; showNotification(`✓ Confirmed: ${pokemon} holds ${item}`, 'success'); displayPredictions(currentBattle.predictions.filter(p => p.isPredictedPick).slice(0,4)); }
-        }
-        
-        function confirmCustomItem(pokemon) {
-            const input = document.getElementById(`customItem_${pokemon.replace(/[^a-zA-Z]/g, '')}`);
-            if (input.value.trim()) { confirmItem(pokemon, input.value.trim()); input.value = ''; }
-            else showNotification('Please enter an item name', 'warning');
-        }
-        
-        function finishBattle() {
-            const confirmedPicks = currentBattle.predictions.filter(p => p.actualItem !== null);
-            if (confirmedPicks.length < 4) { showNotification(`Please confirm items for at least 4 Pokémon first (${confirmedPicks.length}/4)`, 'warning'); return; }
-            
-            const { yourTeam } = getTeams();
-            const yourTeamKey = yourTeam.map(p => p.pokemon).sort().join(',');
-            
-            currentBattle.predictions.forEach(pred => {
-                if (pred.actualItem) {
-                    const patternKey = `${yourTeamKey}|item|${pred.pokemon}`;
-                    if (!learningData.patterns[patternKey]) learningData.patterns[patternKey] = {};
-                    learningData.patterns[patternKey][pred.actualItem] = (learningData.patterns[patternKey][pred.actualItem] || 0) + 1;
-                    learningData.itemAccuracy.total++;
-                    if (pred.predictedItem === pred.actualItem) learningData.itemAccuracy.correct++;
-                }
-                
-                if (pred.isPredictedPick) {
-                    const pickKey = `${yourTeamKey}|bring|${pred.pokemon}`;
-                    if (!learningData.patterns[pickKey]) learningData.patterns[pickKey] = { brought: 0, total: 0, bringRate: 0 };
-                    learningData.patterns[pickKey].total++;
-                    learningData.patterns[pickKey].brought++;
-                    learningData.patterns[pickKey].bringRate = learningData.patterns[pickKey].brought / learningData.patterns[pickKey].total;
-                    learningData.pickAccuracy.total++;
-                    learningData.pickAccuracy.correct++;
-                }
-            });
-            
-            learningData.totalBattles++;
-            saveLearningData();
-            const itemAcc = (learningData.itemAccuracy.correct / learningData.itemAccuracy.total * 100).toFixed(1);
-            showNotification(`🧠 Learned! Item accuracy: ${itemAcc}% | Battle recorded!`, 'success');
-            updateLearningStats();
-            setTimeout(() => resetBattle(), 2000);
-        }
-        
-        function resetBattle() { currentBattle.predictions = []; currentBattle.actualPicks = []; document.getElementById('predictionsCard').style.display = 'none'; showNotification('✨ Ready for next battle!', 'info'); }
-        
-        function updateLearningStats() {
-            const itemAcc = learningData.itemAccuracy.total ? (learningData.itemAccuracy.correct / learningData.itemAccuracy.total * 100).toFixed(1) : 0;
-            document.getElementById('learningStats').innerHTML = `<div class="stats-grid"><div class="stat-box"><div class="stat-number">${learningData.totalBattles}</div><div>Battles</div></div><div class="stat-box"><div class="stat-number">${itemAcc}%</div><div>Item Accuracy</div></div><div class="stat-box"><div class="stat-number">🎯</div><div>Learning!</div></div></div><div style="margin-top: 10px; font-size: 0.8em; text-align: center;">💡 AI learns from every battle - predicts picks, items, and Mega!</div>`;
-        }
-        
-        function updatePredictions() { const { opponentTeam } = getTeams(); if (opponentTeam.length >= 4) predictBattle(); else document.getElementById('predictionsCard').style.display = 'none'; }
-        
-        function displayMetaStats() {
-            document.getElementById('metaStats').innerHTML = `<div style="margin-bottom: 12px;"><div><strong>Top M-1 Threats</strong></div><div style="font-size: 0.8em;">Flutter Mane | Iron Hands | Incineroar | Garchomp | Dragapult</div><div style="margin-top: 8px;"><strong>Common Mega Evolutions</strong></div><div style="font-size: 0.8em;">Charizard, Gengar, Kangaskhan, Gyarados, Lucario, Metagross</div></div>`;
-            document.getElementById('lastUpdate').innerHTML = `🏆 M-1 Season (April 8 - May 13) | Predicting: Picks | Items | Mega | Learning from ${learningData.totalBattles} battles`;
-        }
-        
-        function saveLearningData() { localStorage.setItem('pokemon_champions_battle_learning', JSON.stringify(learningData)); }
-        function loadLearningData() { const saved = localStorage.getItem('pokemon_champions_battle_learning'); if (saved) { learningData = JSON.parse(saved); updateLearningStats(); } }
-        
-        const metaData = { "Flutter Mane": 47.3, "Iron Hands": 41.2, "Incineroar": 35.2, "Garchomp": 25.5, "Dragapult": 12.5 };
-        
-        function init() { loadLearningData(); initTeamSelectors(); displayMetaStats(); }
-        function showNotification(message, type) { const n = document.createElement('div'); n.className = 'notification'; n.innerHTML = message; document.body.appendChild(n); setTimeout(() => n.remove(), 3000); }
-        
-        init();
-    </script>
+    <div class="team-box">
+      <div class="team-lbl lbl-me">My Team (known)</div>
+      <div class="team-slots" id="my-slots"></div>
+    </div>
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="poke-search" placeholder="Search Pokémon..." oninput="renderGrid()">
+    <select id="tier-filter" onchange="renderGrid()">
+      <option value="">All tiers</option>
+      <option value="S">S tier</option>
+      <option value="A+">A+ tier</option>
+      <option value="A">A tier</option>
+      <option value="B">B tier</option>
+      <option value="C">C tier</option>
+    </select>
+    <select id="role-filter" onchange="renderGrid()">
+      <option value="">All roles</option>
+      <option value="support">Support</option>
+      <option value="attacker">Attacker</option>
+      <option value="weather">Weather</option>
+    </select>
+    <select id="add-to" onchange="renderGrid()">
+      <option value="opp">→ Opp</option>
+      <option value="me">→ Me</option>
+    </select>
+  </div>
+  <div class="poke-grid" id="pokemon-grid"></div>
+
+  <button class="predict-btn" id="predict-btn" onclick="runPrediction()" disabled>
+    Predict Opponent's Bring-4 →
+  </button>
+
+  <div id="predictions-area">
+    <div class="empty-state">Add 2–6 Pokémon to the opponent's team to unlock bring-4 predictions.<br><span style="font-size:11px;color:#55556a">Based on M-1 usage rates, tier, and Mega Evolution potential</span></div>
+  </div>
+</div>
+
+<!-- META TAB -->
+<div id="tab-meta" class="panel">
+  <div class="meta-filters">
+    <button class="fpill active" onclick="filterMeta(this,'all')">All</button>
+    <button class="fpill" onclick="filterMeta(this,'S')">S Tier</button>
+    <button class="fpill" onclick="filterMeta(this,'A+')">A+ Tier</button>
+    <button class="fpill" onclick="filterMeta(this,'A')">A Tier</button>
+    <button class="fpill" onclick="filterMeta(this,'support')">Support</button>
+    <button class="fpill" onclick="filterMeta(this,'attacker')">Attacker</button>
+    <button class="fpill" onclick="filterMeta(this,'weather')">Weather</button>
+    <button class="fpill" onclick="filterMeta(this,'mega')">Has Mega</button>
+  </div>
+  <div class="meta-list" id="meta-list"></div>
+</div>
+
+<!-- LOG TAB -->
+<div id="tab-log" class="panel">
+  <div class="stats-grid">
+    <div class="scard"><div class="snum" id="stat-total">0</div><div class="slbl">Battles</div></div>
+    <div class="scard"><div class="snum" id="stat-wr">—</div><div class="slbl">Win rate</div></div>
+    <div class="scard"><div class="snum" id="stat-streak">—</div><div class="slbl">Streak</div></div>
+  </div>
+  <div class="log-form">
+    <label>Result</label>
+    <div class="result-btns">
+      <button class="rbtn" id="btn-win" onclick="setResult('Win')">Win</button>
+      <button class="rbtn" id="btn-loss" onclick="setResult('Loss')">Loss</button>
+    </div>
+    <label>Opponent's lead (optional)</label>
+    <input type="text" id="log-opp" placeholder="e.g. Incineroar + Dragonite">
+    <label>My lead (optional)</label>
+    <input type="text" id="log-me" placeholder="e.g. Whimsicott + Garchomp">
+    <label>Notes</label>
+    <textarea id="log-note" placeholder="Key reads, misplays, or anything to remember..."></textarea>
+    <button class="log-submit" onclick="logBattle()">Log Battle</button>
+  </div>
+  <div class="log-entries" id="log-entries"></div>
+</div>
+
+</div>
+
+<script>
+const RAW = [
+  {id:727,name:"Incineroar",tier:"S",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:96},
+  {id:983,name:"Kingambit",tier:"S",role:"attacker",tags:["attacker"],item:"Assault Vest",mega:false,usage:94},
+  {id:445,name:"Garchomp",tier:"A+",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:82},
+  {id:6,name:"Charizard",tier:"A+",role:"weather",tags:["attacker","weather"],item:"Charizardite Y",mega:true,usage:81},
+  {id:812,name:"Rillaboom",tier:"A+",role:"weather",tags:["attacker","weather"],item:"Choice Band",mega:false,usage:76},
+  {id:324,name:"Torkoal",tier:"A+",role:"weather",tags:["support","weather"],item:"Charcoal",mega:false,usage:75},
+  {id:645,name:"Landorus",tier:"A+",role:"support",tags:["support"],item:"Assault Vest",mega:false,usage:73},
+  {id:938,name:"Glimmora",tier:"A+",role:"attacker",tags:["attacker"],item:"Power Herb",mega:false,usage:72},
+  {id:959,name:"Espathra",tier:"A+",role:"attacker",tags:["attacker"],item:"Speed Boost",mega:false,usage:71},
+  {id:547,name:"Whimsicott",tier:"A",role:"support",tags:["support"],item:"Mental Herb",mega:false,usage:68},
+  {id:987,name:"Flutter Mane",tier:"A",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:66},
+  {id:598,name:"Sneasler",tier:"A",role:"attacker",tags:["attacker"],item:"Focus Sash",mega:false,usage:65},
+  {id:658,name:"Greninja",tier:"A",role:"attacker",tags:["attacker"],item:"Life Orb",mega:true,usage:64},
+  {id:730,name:"Primarina",tier:"A",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:61},
+  {id:994,name:"Sinistcha",tier:"A",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:60},
+  {id:976,name:"Gholdengo",tier:"A",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:59},
+  {id:115,name:"Kangaskhan",tier:"A",role:"attacker",tags:["attacker"],item:"Kangaskhanite",mega:true,usage:57},
+  {id:951,name:"Farigiraf",tier:"A",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:57},
+  {id:530,name:"Excadrill",tier:"A",role:"attacker",tags:["attacker","weather"],item:"Assault Vest",mega:false,usage:55},
+  {id:257,name:"Blaziken",tier:"A",role:"attacker",tags:["attacker"],item:"Blazikenite",mega:true,usage:54},
+  {id:65,name:"Alakazam",tier:"A",role:"attacker",tags:["attacker"],item:"Focus Sash",mega:true,usage:52},
+  {id:149,name:"Dragonite",tier:"A+",role:"attacker",tags:["attacker"],item:"Lum Berry",mega:true,usage:82},
+  {id:248,name:"Tyranitar",tier:"A",role:"weather",tags:["attacker","weather"],item:"Choice Scarf",mega:true,usage:63},
+  {id:184,name:"Azumarill",tier:"A",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:56},
+  {id:154,name:"Meganium",tier:"A",role:"support",tags:["support","weather"],item:"Sitrus Berry",mega:true,usage:60},
+  {id:160,name:"Feraligatr",tier:"A",role:"attacker",tags:["attacker"],item:"Life Orb",mega:true,usage:58},
+  {id:892,name:"Urshifu",tier:"A+",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:false,usage:77},
+  {id:59,name:"Arcanine",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:62},
+  {id:887,name:"Dragapult",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:46},
+  {id:815,name:"Cinderace",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:47},
+  {id:913,name:"Ceruledge",tier:"B",role:"attacker",tags:["attacker"],item:"Weakness Policy",mega:false,usage:46},
+  {id:912,name:"Armarouge",tier:"B",role:"attacker",tags:["attacker"],item:"Assault Vest",mega:false,usage:44},
+  {id:966,name:"Palafin",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:44},
+  {id:448,name:"Lucario",tier:"B",role:"attacker",tags:["attacker"],item:"Lucarionite",mega:true,usage:42},
+  {id:450,name:"Hippowdon",tier:"B",role:"weather",tags:["support","weather"],item:"Smooth Rock",mega:false,usage:28},
+  {id:479,name:"Rotom",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:35},
+  {id:488,name:"Cresselia",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:33},
+  {id:861,name:"Grimmsnarl",tier:"B",role:"support",tags:["support"],item:"Light Clay",mega:false,usage:39},
+  {id:823,name:"Corviknight",tier:"B",role:"support",tags:["support"],item:"Rocky Helmet",mega:false,usage:33},
+  {id:908,name:"Clodsire",tier:"B",role:"support",tags:["support"],item:"Black Sludge",mega:false,usage:29},
+  {id:927,name:"Garganacl",tier:"B",role:"support",tags:["support"],item:"Leftovers",mega:false,usage:27},
+  {id:707,name:"Klefki",tier:"B",role:"support",tags:["support"],item:"Light Clay",mega:false,usage:27},
+  {id:797,name:"Celesteela",tier:"B",role:"support",tags:["support"],item:"Leftovers",mega:false,usage:31},
+  {id:784,name:"Kommo-o",tier:"B",role:"attacker",tags:["attacker"],item:"Throat Spray",mega:false,usage:33},
+  {id:681,name:"Aegislash",tier:"B",role:"attacker",tags:["attacker"],item:"Weakness Policy",mega:false,usage:34},
+  {id:380,name:"Latias",tier:"B",role:"attacker",tags:["attacker"],item:"Latiasite",mega:true,usage:34},
+  {id:381,name:"Latios",tier:"B",role:"attacker",tags:["attacker"],item:"Latiosite",mega:true,usage:36},
+  {id:254,name:"Sceptile",tier:"B",role:"attacker",tags:["attacker"],item:"Sceptilite",mega:true,usage:32},
+  {id:303,name:"Mawile",tier:"B",role:"attacker",tags:["attacker"],item:"Mawilite",mega:true,usage:31},
+  {id:475,name:"Gallade",tier:"B",role:"attacker",tags:["attacker"],item:"Galladite",mega:true,usage:31},
+  {id:639,name:"Terrakion",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:31},
+  {id:282,name:"Gardevoir",tier:"B",role:"support",tags:["support"],item:"Shuca Berry",mega:true,usage:45},
+  {id:214,name:"Heracross",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:true,usage:36},
+  {id:637,name:"Volcarona",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:38},
+  {id:549,name:"Lilligant",tier:"B",role:"support",tags:["support","weather"],item:"Mental Herb",mega:false,usage:27},
+  {id:461,name:"Weavile",tier:"B",role:"attacker",tags:["attacker"],item:"Focus Sash",mega:false,usage:37},
+  {id:286,name:"Breloom",tier:"B",role:"attacker",tags:["attacker"],item:"Focus Sash",mega:false,usage:36},
+  {id:392,name:"Infernape",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:38},
+  {id:979,name:"Chien-Pao",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:38},
+  {id:38,name:"Ninetales",tier:"B",role:"weather",tags:["support","weather"],item:"Heat Rock",mega:false,usage:32},
+  {id:671,name:"Florges",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:27},
+  {id:398,name:"Staraptor",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:false,usage:30},
+  {id:473,name:"Mamoswine",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:30},
+  {id:741,name:"Tornadus",tier:"B",role:"support",tags:["support"],item:"Mental Herb",mega:false,usage:35},
+  {id:642,name:"Thundurus",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:32},
+  {id:142,name:"Aerodactyl",tier:"B",role:"attacker",tags:["attacker"],item:"Aerodactylite",mega:true,usage:30},
+  {id:130,name:"Gyarados",tier:"B",role:"attacker",tags:["attacker"],item:"Lum Berry",mega:true,usage:48},
+  {id:373,name:"Salamence",tier:"B",role:"attacker",tags:["attacker"],item:"Lum Berry",mega:true,usage:49},
+  {id:502,name:"Dewott",tier:"C",role:"attacker",tags:["attacker"],item:"Eviolite",mega:false,usage:5},
+  {id:91,name:"Cloyster",tier:"B",role:"attacker",tags:["attacker"],item:"Focus Sash",mega:false,usage:24},
+  {id:94,name:"Gengar",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:true,usage:44},
+  {id:308,name:"Medicham",tier:"B",role:"attacker",tags:["attacker"],item:"Medichamite",mega:true,usage:36},
+  {id:310,name:"Manectric",tier:"B",role:"attacker",tags:["attacker"],item:"Manectite",mega:true,usage:29},
+  {id:323,name:"Camerupt",tier:"B",role:"weather",tags:["weather"],item:"Cameruptite",mega:true,usage:26},
+  {id:359,name:"Absol",tier:"B",role:"attacker",tags:["attacker"],item:"Absolite",mega:true,usage:28},
+  {id:212,name:"Scizor",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:true,usage:43},
+  {id:181,name:"Ampharos",tier:"B",role:"attacker",tags:["attacker"],item:"Ampharosite",mega:true,usage:24},
+  {id:700,name:"Sylveon",tier:"B",role:"support",tags:["support"],item:"Pixie Plate",mega:false,usage:40},
+  {id:663,name:"Talonflame",tier:"B",role:"attacker",tags:["attacker"],item:"Sharp Beak",mega:false,usage:37},
+  {id:196,name:"Espeon",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:30},
+  {id:576,name:"Gothitelle",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:22},
+  {id:579,name:"Reuniclus",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:26},
+  {id:553,name:"Krookodile",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:false,usage:29},
+  {id:612,name:"Haxorus",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:false,usage:31},
+  {id:635,name:"Hydreigon",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:44},
+  {id:701,name:"Hawlucha",tier:"B",role:"attacker",tags:["attacker"],item:"Electric Seed",mega:false,usage:29},
+  {id:980,name:"Ting-Lu",tier:"B",role:"support",tags:["support"],item:"Leftovers",mega:false,usage:32},
+  {id:982,name:"Roaring Moon",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:false,usage:35},
+  {id:983,name:"Iron Valiant",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:31},
+  {id:981,name:"Chi-Yu",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:36},
+  {id:9,name:"Blastoise",tier:"B",role:"attacker",tags:["attacker"],item:"White Herb",mega:true,usage:40},
+  {id:3,name:"Venusaur",tier:"B",role:"support",tags:["support","weather"],item:"Miracle Seed",mega:true,usage:38},
+  {id:157,name:"Typhlosion",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Scarf",mega:false,usage:35},
+  {id:302,name:"Sableye",tier:"B",role:"support",tags:["support"],item:"Sablenite",mega:true,usage:27},
+  {id:598,name:"Ferrothorn",tier:"B",role:"support",tags:["support"],item:"Rocky Helmet",mega:false,usage:28},
+  {id:121,name:"Starmie",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:true,usage:32},
+  {id:260,name:"Swampert",tier:"B",role:"weather",tags:["attacker","weather"],item:"Choice Specs",mega:true,usage:38},
+  {id:350,name:"Milotic",tier:"B",role:"support",tags:["support"],item:"Flame Orb",mega:false,usage:34},
+  {id:423,name:"Gastrodon",tier:"B",role:"support",tags:["support"],item:"Rocky Helmet",mega:false,usage:36},
+  {id:474,name:"Porygon-Z",tier:"B",role:"attacker",tags:["attacker"],item:"Normal Gem",mega:false,usage:26},
+  {id:233,name:"Porygon2",tier:"B",role:"support",tags:["support"],item:"Eviolite",mega:false,usage:26},
+  {id:426,name:"Drifblim",tier:"C",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:11},
+  {id:199,name:"Slowking",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:25},
+  {id:245,name:"Suicune",tier:"B",role:"support",tags:["support"],item:"Assault Vest",mega:false,usage:24},
+  {id:243,name:"Raikou",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:27},
+  {id:534,name:"Conkeldurr",tier:"B",role:"attacker",tags:["attacker"],item:"Flame Orb",mega:false,usage:32},
+  {id:503,name:"Samurott",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:33},
+  {id:472,name:"Gliscor",tier:"B",role:"support",tags:["support"],item:"Toxic Orb",mega:false,usage:29},
+  {id:909,name:"Skeledirge",tier:"B",role:"attacker",tags:["attacker"],item:"Leftovers",mega:false,usage:31},
+  {id:462,name:"Magnezone",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:28},
+  {id:810,name:"Grookey",tier:"C",role:"support",tags:["support","weather"],item:"Eviolite",mega:false,usage:4},
+  {id:813,name:"Thwackey",tier:"C",role:"support",tags:["support","weather"],item:"Eviolite",mega:false,usage:3},
+  {id:230,name:"Kingdra",tier:"B",role:"attacker",tags:["attacker","weather"],item:"Choice Scarf",mega:false,usage:32},
+  {id:748,name:"Toxapex",tier:"B",role:"support",tags:["support"],item:"Black Sludge",mega:false,usage:29},
+  {id:809,name:"Melmetal",tier:"B",role:"attacker",tags:["attacker"],item:"Assault Vest",mega:false,usage:38},
+  {id:763,name:"Tsareena",tier:"B",role:"support",tags:["support"],item:"Assault Vest",mega:false,usage:28},
+  {id:905,name:"Enamorus",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:27},
+  {id:884,name:"Duraludon",tier:"B",role:"attacker",tags:["attacker"],item:"Assault Vest",mega:true,usage:36},
+  {id:849,name:"Toxtricity",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:30},
+  {id:879,name:"Copperajah",tier:"B",role:"attacker",tags:["attacker"],item:"Assault Vest",mega:false,usage:28},
+  {id:655,name:"Delphox",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:32},
+  {id:196,name:"Espeon",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:28},
+  {id:127,name:"Pinsir",tier:"B",role:"attacker",tags:["attacker"],item:"Pinsirite",mega:true,usage:28},
+  {id:169,name:"Crobat",tier:"B",role:"support",tags:["support"],item:"Focus Sash",mega:false,usage:26},
+  {id:242,name:"Blissey",tier:"C",role:"support",tags:["support"],item:"Leftovers",mega:false,usage:15},
+  {id:105,name:"Marowak",tier:"B",role:"attacker",tags:["attacker"],item:"Thick Club",mega:false,usage:26},
+  {id:482,name:"Azelf",tier:"B",role:"attacker",tags:["attacker"],item:"Focus Sash",mega:false,usage:24},
+  {id:571,name:"Zoroark",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:24},
+  {id:145,name:"Zapdos",tier:"B",role:"attacker",tags:["attacker"],item:"Life Orb",mega:false,usage:28},
+  {id:134,name:"Vaporeon",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:24},
+  {id:135,name:"Jolteon",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:22},
+  {id:342,name:"Crawdaunt",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:26},
+  {id:576,name:"Gothitelle",tier:"B",role:"support",tags:["support"],item:"Sitrus Berry",mega:false,usage:22},
+  {id:235,name:"Smeargle",tier:"B",role:"support",tags:["support"],item:"Focus Sash",mega:false,usage:22},
+  {id:208,name:"Steelix",tier:"B",role:"support",tags:["support"],item:"Steelixite",mega:true,usage:24},
+  {id:334,name:"Altaria",tier:"B",role:"support",tags:["support"],item:"Altarianite",mega:true,usage:26},
+  {id:324,name:"Torkoal",tier:"A+",role:"weather",tags:["support","weather"],item:"Charcoal",mega:false,usage:75},
+  {id:186,name:"Politoed",tier:"C",role:"weather",tags:["support","weather"],item:"Damp Rock",mega:false,usage:24},
+  {id:460,name:"Abomasnow",tier:"B",role:"weather",tags:["support","weather"],item:"Never-Melt Ice",mega:true,usage:31},
+  {id:497,name:"Serperior",tier:"B",role:"attacker",tags:["attacker","weather"],item:"Miracle Seed",mega:false,usage:36},
+  {id:131,name:"Lapras",tier:"B",role:"support",tags:["support","weather"],item:"Assault Vest",mega:false,usage:35},
+  {id:217,name:"Ursaring",tier:"C",role:"attacker",tags:["attacker"],item:"Toxic Orb",mega:false,usage:7},
+  {id:68,name:"Machamp",tier:"B",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:26},
+  {id:143,name:"Snorlax",tier:"B",role:"support",tags:["support"],item:"Assault Vest",mega:false,usage:27},
+  {id:395,name:"Empoleon",tier:"B",role:"attacker",tags:["attacker"],item:"Assault Vest",mega:false,usage:34},
+  {id:471,name:"Glaceon",tier:"C",role:"attacker",tags:["attacker","weather"],item:"Choice Specs",mega:false,usage:14},
+  {id:244,name:"Entei",tier:"B",role:"attacker",tags:["attacker","weather"],item:"Choice Band",mega:false,usage:22},
+  {id:471,name:"Flareon",tier:"C",role:"attacker",tags:["attacker"],item:"Choice Band",mega:false,usage:11},
+  {id:224,name:"Octillery",tier:"C",role:"attacker",tags:["attacker"],item:"Choice Specs",mega:false,usage:6},
+  {id:25,name:"Pikachu",tier:"C",role:"attacker",tags:["attacker"],item:"Light Ball",mega:false,usage:8},
+  {id:338,name:"Solrock",tier:"C",role:"support",tags:["support","weather"],item:"Sitrus Berry",mega:false,usage:8},
+  {id:337,name:"Lunatone",tier:"C",role:"support",tags:["support","weather"],item:"Sitrus Berry",mega:false,usage:7},
+];
+
+const POKEMON = [];
+const seen = new Set();
+for(const p of RAW){
+  if(!seen.has(p.name)){seen.add(p.name);POKEMON.push(p);}
+}
+POKEMON.sort((a,b)=>b.usage-a.usage);
+
+let oppTeam=[], myTeam=[], predictions=[], metaFilter='all', battleResult=null, matchLog=[];
+
+function pokeImg(id){return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`}
+
+function renderSlots(arr,cid,side){
+  const c=document.getElementById(cid);
+  c.innerHTML='';
+  for(let i=0;i<6;i++){
+    const d=document.createElement('div');
+    d.className='slot'+(arr[i]?' filled':'');
+    if(arr[i]){
+      const p=arr[i];
+      d.innerHTML=`<button class="slot-x" onclick="removeSlot('${side}',${i})">✕</button><img src="${pokeImg(p.id)}" alt="${p.name}"><div class="slot-name">${p.name}</div><div class="slot-item">${p.item}</div>${p.mega?'<div class="slot-mega">MEGA ✦</div>':''}`;
+    } else {
+      d.innerHTML=`<span class="slot-empty">+</span>`;
+    }
+    c.appendChild(d);
+  }
+}
+
+function removeSlot(side,i){
+  if(side==='opp') oppTeam.splice(i,1);
+  else myTeam.splice(i,1);
+  updateAll();
+}
+
+function renderGrid(){
+  const q=document.getElementById('poke-search').value.toLowerCase();
+  const tier=document.getElementById('tier-filter').value;
+  const role=document.getElementById('role-filter').value;
+  const side=document.getElementById('add-to').value;
+  const curTeam=side==='opp'?oppTeam:myTeam;
+  const grid=document.getElementById('pokemon-grid');
+  grid.innerHTML='';
+  let shown=0;
+  for(const p of POKEMON){
+    if(tier&&p.tier!==tier) continue;
+    if(role&&!p.tags.includes(role)) continue;
+    if(q&&!p.name.toLowerCase().includes(q)) continue;
+    if(shown>=120) break;
+    shown++;
+    const inOpp=oppTeam.some(x=>x.name===p.name);
+    const inMe=myTeam.some(x=>x.name===p.name);
+    const full=curTeam.length>=6&&!inOpp&&!inMe;
+    const btn=document.createElement('button');
+    btn.className='pb'+(inOpp?' sel-opp':inMe?' sel-me':full?' dis':'');
+    const tc='t-'+(p.tier==='A+'?'Ap':p.tier);
+    btn.innerHTML=`<span class="tier-badge ${tc}">${p.tier}</span><img src="${pokeImg(p.id)}" alt="${p.name}" loading="lazy"><div class="pb-name">${p.name}</div>`;
+    btn.onclick=()=>togglePoke(p,side);
+    grid.appendChild(btn);
+  }
+}
+
+function togglePoke(p,side){
+  if(side==='opp'){
+    const i=oppTeam.findIndex(x=>x.name===p.name);
+    if(i>=0) oppTeam.splice(i,1); else if(oppTeam.length<6) oppTeam.push({...p});
+  } else {
+    const i=myTeam.findIndex(x=>x.name===p.name);
+    if(i>=0) myTeam.splice(i,1); else if(myTeam.length<6) myTeam.push({...p});
+  }
+  updateAll();
+}
+
+function updateAll(){
+  renderSlots(oppTeam,'opp-slots','opp');
+  renderSlots(myTeam,'my-slots','me');
+  renderGrid();
+  document.getElementById('predict-btn').disabled=oppTeam.length<2;
+  if(oppTeam.length<2){
+    document.getElementById('predictions-area').innerHTML='<div class="empty-state">Add 2–6 Pokémon to the opponent\'s team to unlock bring-4 predictions.<br><span style="font-size:11px;color:#55556a">Based on M-1 usage rates, tier, and Mega Evolution potential</span></div>';
+    predictions=[];
+  }
+}
+
+function runPrediction(){
+  const scored=oppTeam.map(p=>{
+    let s=p.usage;
+    if(p.tier==='S') s+=25; if(p.tier==='A+') s+=18; if(p.tier==='A') s+=10; if(p.tier==='B') s+=4;
+    if(p.mega) s+=7;
+    if(p.role==='weather') s+=5;
+    return{p:{...p},s,confirmed:false};
+  });
+  scored.sort((a,b)=>b.s-a.s);
+  predictions=scored.slice(0,Math.min(4,oppTeam.length));
+  renderPredictions();
+}
+
+function renderPredictions(){
+  const area=document.getElementById('predictions-area');
+  if(!predictions.length){area.innerHTML='';return;}
+  let html='<div class="pred-section-h">Predicted bring-4 picks</div><div class="bring4">';
+  for(const pred of predictions){
+    const p=pred.p;
+    const pct=Math.min(99,Math.round(50+(p.usage/100)*44));
+    html+=`<div class="bcard${pred.confirmed?' confirmed':''}">
+      <div class="bcard-prob">${pct}%</div>
+      <img src="${pokeImg(p.id)}" alt="${p.name}">
+      <div class="bcard-name">${p.name}</div>
+      ${p.mega?'<div class="bcard-mega">MEGA ✦</div>':''}
+      <div class="bcard-item">${p.item}</div>
+      <button class="item-toggle${pred.confirmed?' conf':''}" onclick="toggleConf('${p.name}')">${pred.confirmed?'✓ Seen':'Mark as seen'}</button>
+    </div>`;
+  }
+  html+=`</div><div class="action-row">
+    <button class="btn-conf" onclick="confirmAndLearn()">✓ Confirm & Learn</button>
+    <button class="btn-new" onclick="newBattle()">New Battle</button>
+  </div>`;
+  area.innerHTML=html;
+}
+
+function toggleConf(name){
+  const pred=predictions.find(x=>x.p.name===name);
+  if(pred) pred.confirmed=!pred.confirmed;
+  renderPredictions();
+}
+
+function confirmAndLearn(){
+  predictions.forEach(pred=>{
+    if(pred.confirmed){
+      const poke=POKEMON.find(x=>x.name===pred.p.name);
+      if(poke) poke.usage=Math.min(100,poke.usage+2);
+    }
+  });
+  alert('Usage rates updated. Keep tracking to improve predictions!');
+  newBattle();
+}
+
+function newBattle(){
+  oppTeam=[];predictions=[];
+  updateAll();
+  renderMeta();
+}
+
+function renderMeta(){
+  const list=document.getElementById('meta-list');
+  let filtered=POKEMON.filter(p=>{
+    if(metaFilter==='all') return true;
+    if(metaFilter==='S') return p.tier==='S';
+    if(metaFilter==='A+') return p.tier==='A+';
+    if(metaFilter==='A') return p.tier==='A';
+    if(metaFilter==='support') return p.role==='support';
+    if(metaFilter==='attacker') return p.role==='attacker';
+    if(metaFilter==='weather') return p.tags.includes('weather');
+    if(metaFilter==='mega') return p.mega;
+    return true;
+  });
+  const top=filtered.slice(0,50);
+  const maxU=top[0]?top[0].usage:100;
+  list.innerHTML=top.map((p,i)=>{
+    const tc='chip-'+(p.tier==='A+'?'Ap':p.tier);
+    return`<div class="mrow">
+      <div class="mrank">#${i+1}</div>
+      <img src="${pokeImg(p.id)}" alt="${p.name}">
+      <div class="minfo"><div class="mname">${p.name}${p.mega?' ✦':''}</div><div class="mrole">${p.role} · ${p.item}</div></div>
+      <div class="mbar-wrap">
+        <div class="mbar-bg"><div class="mbar-fill" style="width:${Math.round((p.usage/maxU)*100)}%"></div></div>
+        <div class="mpct">${p.usage}% usage</div>
+      </div>
+      <div class="tier-chip ${tc}">${p.tier}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterMeta(el,f){
+  metaFilter=f;
+  document.querySelectorAll('.fpill').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderMeta();
+}
+
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+function setResult(r){
+  battleResult=r;
+  document.getElementById('btn-win').className='rbtn'+(r==='Win'?' win-on':'');
+  document.getElementById('btn-loss').className='rbtn'+(r==='Loss'?' loss-on':'');
+}
+
+function logBattle(){
+  if(!battleResult){alert('Select Win or Loss first.');return;}
+  matchLog.unshift({result:battleResult,opp:document.getElementById('log-opp').value.trim(),me:document.getElementById('log-me').value.trim(),note:document.getElementById('log-note').value.trim(),date:new Date().toLocaleDateString()});
+  document.getElementById('log-opp').value='';
+  document.getElementById('log-me').value='';
+  document.getElementById('log-note').value='';
+  battleResult=null;
+  document.getElementById('btn-win').className='rbtn';
+  document.getElementById('btn-loss').className='rbtn';
+  renderLog();
+}
+
+function renderLog(){
+  const total=matchLog.length;
+  const wins=matchLog.filter(x=>x.result==='Win').length;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-wr').textContent=total?Math.round(wins/total*100)+'%':'—';
+  let streak=0;
+  if(total){const r=matchLog[0].result;for(const e of matchLog){if(e.result===r)streak++;else break;}}
+  document.getElementById('stat-streak').textContent=total?(matchLog[0].result[0]+streak):'—';
+  document.getElementById('log-entries').innerHTML=matchLog.map(e=>`<div class="lentry">
+    <div class="rdot ${e.result==='Win'?'w':'l'}">${e.result==='Win'?'WIN':'LOSS'}</div>
+    <div class="linfo">
+      <div class="lopp">${e.opp||'Unknown lead'}</div>
+      ${e.me?`<div class="lpicks">My lead: ${e.me}</div>`:''}
+      ${e.note?`<div class="lnote">${e.note}</div>`:''}
+    </div>
+    <div class="ldate">${e.date}</div>
+  </div>`).join('');
+}
+
+updateAll();
+renderMeta();
+renderLog();
+</script>
 </body>
 </html>
